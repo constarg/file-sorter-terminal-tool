@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
+#include <stdlib.h>
+
 #include "argumentHandler.h"
+#include "configHandler.h"
 
 #define HELP_ARG "--help"
 #define ADD_CHECK "--add-check"
@@ -40,6 +44,8 @@ void listTargets();
 void listOptions();
 
 int validateArg(char*, char* , char*,char*,int, int);
+
+void replaceOptionValues(int , char *, char *, char *);
 
 void parse(int argc, char **argv) {
     int found = 1;
@@ -103,7 +109,17 @@ void help() {
 }
 
 void addCheck(char *path) {
-    // TODO add check.
+    char* config = NULL;
+
+    if (readConfig(&config) == -1) {
+        fprintf(stderr, "%s\n", strerror(errno));
+        return;
+    }
+
+    // TODO Find a way to change the check.
+    // TODO Ensure that the path is a valid path.
+
+    free(config);
 }
 
 void addTarget(char *ext, char *path) {
@@ -119,7 +135,26 @@ void removeTarget(char *ext, char *path) {
 }
 
 void setCheckInterval(char *checkInterval) {
-    // TODO set check interval.
+    char* interval = malloc((strlen(checkInterval) + 1) * sizeof(char));
+    strcpy(interval, checkInterval);
+
+    int check = strtol(checkInterval, &checkInterval, 10);
+    char* config = NULL;
+
+    if (check == 0) {
+        fprintf(stderr, "invalid check interval\n");
+        return;
+    }
+
+    if (readConfig(&config) == -1) {
+        fprintf(stderr, "%s\n", strerror(errno));
+        return;
+    }
+
+    replaceOptionValues(1, config, "checkInterval", interval);
+
+    free(interval);
+    free(config);
 }
 
 void setParseInterval(char *parseInterval) {
@@ -177,6 +212,69 @@ int validateArg(char* arg_1,
 }
 
 
+void replaceOptionValues(int blockIndex,
+                         char* config,
+                         char* blockName,
+                         char* newValue) {
 
+    char** configBlocks = calloc(5, sizeof(char*));
+    char* blockSplitter = "\n";
+    char* tmp = NULL;
+    size_t locationOfInterestLen;
+    size_t blockNameLen;
+    size_t configSize = strlen(config);
 
+    // save targets and checks.
+    tmp = strstr(config, "[check]");
+    char *dependencies = calloc(strlen(tmp) + 1, sizeof(char));
+    strcpy(dependencies, tmp);
 
+    // get all the options and split them in 4 block.
+    configBlocks[0] = strtok(config, blockSplitter);
+    for (int block = 1; block < 5; block++) {
+        configBlocks[block] = strtok(NULL, blockSplitter);
+    }
+
+    // find the location that we are interested.
+    char* locationOfInterest = &configBlocks[blockIndex][strlen(blockName) + 1];
+    locationOfInterestLen = strlen(locationOfInterest);;
+
+    char* empty = calloc(locationOfInterestLen, sizeof(char));
+
+    // fill empty cells of memory.
+    for (int emp = 0; emp < locationOfInterestLen; emp++) empty[emp] = ' ';
+
+    // clear the previous stored value.
+    memmove(locationOfInterest, empty, locationOfInterestLen);
+    // store the new value.
+    memmove(locationOfInterest, newValue, strlen(newValue));
+
+    blockNameLen = strlen(blockName);
+    tmp = calloc(locationOfInterestLen + blockNameLen + 10, sizeof(char));
+    // reallocate the old value a an new string so that is not depending on the other blocks.
+    strncpy(tmp, blockName, blockNameLen);
+    strcat(tmp, " ");
+    strcat(tmp, locationOfInterest);
+    strcat(tmp, "\n");
+
+    // Finish the new config.
+    char *newConfig = calloc(configSize + (strlen(newValue) - locationOfInterestLen) + strlen(dependencies), sizeof(char));
+
+    strcpy(newConfig, configBlocks[0]);
+    strcat(newConfig, "\n");
+    strcat(newConfig, tmp);
+    for (int concat = 2; concat < 5; concat++) {
+        strcat(newConfig, configBlocks[concat]);
+        strcat(newConfig, "\n");
+    }
+    strcat(newConfig, "\n");
+    strcat(newConfig, dependencies);
+
+    printf("%s\n", newConfig);
+
+    free(tmp);
+    free(newConfig);
+    free(dependencies);
+    free(empty);
+    free(configBlocks);
+}
