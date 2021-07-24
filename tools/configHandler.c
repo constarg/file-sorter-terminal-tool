@@ -10,7 +10,7 @@
 
 int getConfig(int, size_t *);
 
-int writeConfig(char* changes, size_t changesLen) {
+int writeConfig(char *changes, size_t changesLen) {
     int configFD = getConfig(O_RDWR | O_TRUNC, NULL);
 
     if (configFD == -1) return configFD;
@@ -20,10 +20,10 @@ int writeConfig(char* changes, size_t changesLen) {
     return 0;
 }
 
-int readConfig(char** configContent) {
+int readConfig(char **configContent) {
     size_t configLen;
     int configFD = getConfig(O_RDONLY, &configLen);
-    char* buffer;
+    char *buffer;
 
     if (configFD == -1) return configFD;
     if (configLen == -1) return (int) configLen;
@@ -40,8 +40,8 @@ int readConfig(char** configContent) {
 }
 
 int getConfig(int flag, size_t *configLen) {
-    char* username = getlogin();
-    char* configPath = calloc(1, sizeof(char) * (strlen(CONFIG_PATH) + strlen(username) + strlen("home") + 3));
+    char *username = getlogin();
+    char *configPath = calloc(1, sizeof(char) * (strlen(CONFIG_PATH) + strlen(username) + strlen("home") + 3));
     struct stat configStat;
     int fd;
 
