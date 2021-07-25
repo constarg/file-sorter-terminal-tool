@@ -51,6 +51,8 @@ void replace(int, char*, char*, int);
 
 int isValidIntValue(char* , char**);
 
+void list(char*, char*);
+
 void parse(int argc, char **argv) {
     int found = 1;
 
@@ -92,10 +94,10 @@ void parse(int argc, char **argv) {
             listChecks();
 
         else if (validateArg(argv[1], NULL, NULL, LIST_OPTIONS, 0, 14))
-            listTargets();
+            listOptions();
 
         else if (validateArg(argv[1], NULL, NULL, LIST_TARGETS, 0, 14))
-            listOptions();
+            listTargets();
     }
 
 }
@@ -152,15 +154,15 @@ void setDefaultDirPath(char *defaultDirPath) {
 }
 
 void listChecks() {
-    // TODO list checks.
+    list("[check]", "[done_check]");
 }
 
 void listTargets() {
-    // TODO list targets.
+    list("[targets]", "[done_targets]");
 }
 
 void listOptions() {
-    // TODO list options.
+    list("checkInterval", "[check]");
 }
 
 
@@ -274,7 +276,7 @@ void replace(int index, char* block, char* newValue, int isInteger) {
     }
 
     replaceOptionValues(index, config, block, newValue);
-
+    free(config);
 }
 
 int isValidIntValue(char* value, char** result) {
@@ -292,4 +294,22 @@ int isValidIntValue(char* value, char** result) {
 
     *result = integer;
     return 0;
+}
+
+void list(char* begin, char* end) {
+    char* config = NULL;
+
+    if (readConfig(&config) == -1) return;
+
+    char *start = strstr(config, begin);
+    char *currItem = strtok(start, "\n");
+
+    if (start != NULL) {
+        while (strcmp(currItem, end) != 0) {
+            printf("[*] %s\n", currItem);
+            currItem = strtok(NULL, "\n");
+        }
+
+    }
+    free(config);
 }
