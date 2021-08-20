@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
-#include "tools/argumentHandler.h"
-#include "tools/argumentParser.h"
+#include "tools/include/argumentHandler.h"
+#include "tools/include/argumentParser.h"
 
 int main(int argc, char** argv) {
 
