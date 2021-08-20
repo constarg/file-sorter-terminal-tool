@@ -35,7 +35,7 @@ const struct commandP commands[10] = {
 int findCommand(char *, int *);
 
 void parseArgs(int argc, char** argv) {
-    if (argc == 1) return;
+    if (argc == 1) help();
 
     char *commandName = argv[1];
     int commandIndex = 0;
@@ -44,7 +44,7 @@ void parseArgs(int argc, char** argv) {
     // command not found.
     if (findCommand(commandName, &commandIndex) == -1) help();
     // Command needs a new value, but no value has been set.
-    if (!commands[commandIndex].identifier_two && argc < 2) help();
+    if (!commands[commandIndex].identifier_two && argc < 3) help();
 
     if (strcmp(commands[commandIndex].type, SETTER_TYPE) == 0) setter(commands[commandIndex], argv[2]);
     else if (strcmp(commands[commandIndex].type, LIST_TYPE) == 0) listContent(commands[commandIndex]);
@@ -55,7 +55,7 @@ void parseArgs(int argc, char** argv) {
 int findCommand(char *name, int *resIndex) {
     // Find the command.
     for (int command = 0; command < 7; command++) {
-        if (strcmp(commands[command].identifier_one, name) == 0) {
+        if (strcmp(commands[command].name, name) == 0) {
             *resIndex = command;
             return 0;
         }
