@@ -3,8 +3,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include "argumentParser.h"
-#include "argumentHandler.h"
+#include "include/argumentParser.h"
+#include "include/argumentHandler.h"
 
 #define ADD_CHECK "--add-check"
 #define ADD_TARGET "--add-target"
@@ -48,7 +48,7 @@ void parseArgs(int argc, char** argv) {
 
     if (strcmp(commands[commandIndex].type, SETTER_TYPE) == 0) setter(commands[commandIndex], argv[2]);
     else if (strcmp(commands[commandIndex].type, LIST_TYPE) == 0) listContent(commands[commandIndex]);
-    else if (strcmp(commands[commandIndex].type, ADD_REMOVE_TYPE) == 0) return; // add or remove.
+    else if (strcmp(commands[commandIndex].type, ADD_REMOVE_TYPE) == 0) return; // TODO add or remove.
 
 }
 

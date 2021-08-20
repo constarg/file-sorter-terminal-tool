@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "configHandler.h"
+#include "include/configHandler.h"
 
 #define CONFIG_PATH "/.local/share/file_sorter/config/config.conf"
 

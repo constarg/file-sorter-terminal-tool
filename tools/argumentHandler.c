@@ -3,9 +3,9 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include "argumentHandler.h"
-#include "configHandler.h"
-#include "argumentParser.h"
+#include "include/argumentHandler.h"
+#include "include/configHandler.h"
+#include "include/argumentParser.h"
 
 void replace(int, char*, char*, int);
 
