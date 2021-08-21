@@ -8,13 +8,22 @@
 #include "include/argumentParser.h"
 
 #define OPTION_NUMBER 5
+#define SPLITTER "\n"
+
+#define TARGET_IDENTIFIER "[targets]"
+#define CHECK_IDENTIFIER "[check]"
 
 void list(char *begin, char *end);
+
 void replaceOption(char *option, int optionIndex, char *newValue, int isInteger);
+
 void setOption(char *option, char **options, char *newValue, int index, char *missing, size_t prevConfSize);
+
+void add(char *locationOfItems, int itemsCount, char **options, char *begin, char *end);
 
 int isValidIntValue(char *value, char **result, int returnIntRes);
 
+int countItems(char *items, char *begin, char *end);
 
 void help() {
 
@@ -33,8 +42,6 @@ void help() {
 
     exit(0);
 }
-// TODO add and remove functions.
-// TODO replace function.
 
 void setter(struct commandP commandP, char *newValue) {
     replaceOption(commandP.identifier_one, commandP.index, newValue, commandP.isAddOrInteger);
@@ -58,11 +65,10 @@ void replaceOption(char *option, int optionIndex, char *newValue, int isInteger)
     // save the checks and targets.
     char *missingFields = strstr(missing, "[check]");
     // save the options.
-    char *splitter = "\n";
-    options[0] = strtok(config, splitter);
+    options[0] = strtok(config, SPLITTER);
 
     for (int index = 1; index < OPTION_NUMBER; index++)
-        options[index] = strtok(NULL, splitter);
+        options[index] = strtok(NULL, SPLITTER);
 
     // check if is an integer.
     if (isInteger) {
@@ -71,12 +77,76 @@ void replaceOption(char *option, int optionIndex, char *newValue, int isInteger)
             setOption(option, options, newValue, optionIndex, missingFields, confSize);
 
         free(integerValue);
-    }
-    else setOption(option, options, newValue, optionIndex, missingFields, confSize);
+    } else setOption(option, options, newValue, optionIndex, missingFields, confSize);
 
     free(missing);
     free(options);
     free(config);
+}
+
+void addOrRemove(struct commandP commandP, char **toDeleteOrAdd) {
+    char *config = NULL;
+
+    // get the config.
+    if (readConfig(&config) == -1) return;
+
+    // save the options.
+    char *tmp = calloc(strlen(config), sizeof(char));
+    char *tmpOptions;
+    char **options = calloc(OPTION_NUMBER, sizeof(char*));
+    strcpy(tmp, config);
+    tmpOptions = strstr(tmp, commandP.identifier_one);
+    options[0] = strtok(tmpOptions, SPLITTER);
+
+    for (int option = 1; option < OPTION_NUMBER; option++) options[option] = strtok(NULL, SPLITTER);
+    free(tmp);
+
+    // go to where the items is.
+    char *locationOfInterest = strstr(config, commandP.identifier_one);
+    int itemCount = countItems(locationOfInterest, commandP.identifier_one, commandP.identifier_two);
+
+    if (commandP.isAddOrInteger)
+        add(locationOfInterest, itemCount, options, commandP.identifier_one, commandP.identifier_two);
+
+
+    free(options);
+}
+
+void add(char *locationOfItems,
+         int itemsCount,
+         char **options,
+         char *begin,
+         char *end) {
+
+    // Allocate enough space for the previous item plus the new.
+    char **items = calloc(itemsCount + 1, sizeof(char*));
+    strtok(locationOfItems, SPLITTER);
+
+    // temporary save the items in array.
+    for (int item = 0; item < itemsCount; item++) items[item] = strtok(NULL, SPLITTER);
+
+
+
+    free(items);
+}
+
+int countItems(char *items, char *begin, char *end) {
+    // copy the same items as the original, in the tmp.
+    char *tmp = calloc(strlen(items), sizeof(char));
+    strcpy(tmp, items);
+    // go to the desire location
+    char *tmpItems = strstr(tmp, begin);
+
+    // count the items.
+    int count = 0;
+    char *currItem = strtok(tmpItems, SPLITTER);
+    while (strcmp(currItem, end) != 0) {
+        count++;
+        currItem = strtok(NULL, SPLITTER);
+    }
+
+    free(tmp);
+    return count - 1;
 }
 
 void setOption(char *option,
@@ -96,8 +166,9 @@ void setOption(char *option,
 
     // calculate the size of the new config.
     size_t oldOptionSize = strlen(options[index]);
-    size_t defOfSize = (newOptionSize > oldOptionSize)? (newOptionSize - oldOptionSize): (oldOptionSize - newOptionSize);
-    size_t newConfSize = (newOptionSize > oldOptionSize)? (prevConfSize + defOfSize) : (prevConfSize - defOfSize);
+    size_t defOfSize = (newOptionSize > oldOptionSize) ? (newOptionSize - oldOptionSize) : (oldOptionSize -
+                                                                                            newOptionSize);
+    size_t newConfSize = (newOptionSize > oldOptionSize) ? (prevConfSize + defOfSize) : (prevConfSize - defOfSize);
 
     // temporary save the changed option.
     options[index] = changedOption;
@@ -141,17 +212,17 @@ void list(char *begin, char *end) {
     if (readConfig(&config) == -1) return;
 
     char *start = strstr(config, begin);
-    char *currItem = strtok(start, "\n");
+    char *currItem = strtok(start, SPLITTER);
     int counter = 1;
 
     if (start != NULL) {
         while (currItem != NULL && strcmp(currItem, end) != 0) {
             if (strcmp(begin, currItem) == 0) {
-                currItem = strtok(NULL, "\n");
+                currItem = strtok(NULL, SPLITTER);
                 continue;
             }
             printf("[*] [%d] %s\n", counter, currItem);
-            currItem = strtok(NULL, "\n");
+            currItem = strtok(NULL, SPLITTER);
             counter++;
         }
 
