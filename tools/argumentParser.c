@@ -23,7 +23,7 @@
 // each column represent one property of this specific command.
 const struct commandP commands[11] = {
         ADD_CHECK, ADD_REMOVE_TYPE, 0, "[check]", "[done_check]", 1, 1,
-        ADD_TARGET, ADD_REMOVE_TYPE, 0, "[targets]", "[done_targets]", 1, 1,
+        ADD_TARGET, ADD_REMOVE_TYPE, 0, "[targets]", "[done_targets]", 1, 2,
         REMOVE_CHECK, ADD_REMOVE_TYPE, 0, "[check]", "[done_check]", 0, 1,
         REMOVE_TARGET, ADD_REMOVE_TYPE, 0, "[targets]", "[done_targets]", 0, 1,
         SET_CHECK_INTERVAL, SETTER_TYPE, 1, "checkInterval", NULL, 1, 1,
