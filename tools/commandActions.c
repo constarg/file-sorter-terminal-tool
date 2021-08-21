@@ -29,8 +29,8 @@ void help() {
            "\t--set-debug-log [value] 0:1 Change the log to debug mode (1).\n"
            "\t--add-check [path] Add new check.\n"
            "\t--add-target [ext] [path] Add new target.\n"
-           "\t--remove-check [path] remove check.\n"
-           "\t--remove-target [ext] [path] remove target.\n"
+           "\t--remove-check [row number] remove check.\n"
+           "\t--remove-target [row number] remove target.\n"
            "\t--list-checks list checks.\n"
            "\t--list-targets list targets.\n"
            "\t--list-options list options.\n");
@@ -133,33 +133,47 @@ void replace(int index, char *block, char *newValue, int isInteger) {
 
 void addOrRemove(struct commandP commandP, char **toDeleteOrAdd) {
     char *config = NULL;
+    int itemsCount = countItems(commandP.identifier_one,commandP.identifier_two);
 
     if (readConfig(&config) == -1) return;
 
     char *start = strstr(config, commandP.identifier_one);
-    char *tmp = calloc(sizeof(char), strlen(start) + 2);
+    char *tmp = calloc( strlen(start) + 2, sizeof(char));
     strcpy(tmp, start);
     char *tmp2 = strstr(tmp, commandP.identifier_two);
-    char *save = calloc(sizeof(char*), strlen(tmp2) + 1);
+    char *save = calloc(strlen(tmp2) + 1, sizeof(char*));
     strcpy(save, tmp2);
     free(tmp);
 
+    printf("%s\n", save);
+
     char *splitter = "\n";
-    char **items = calloc(sizeof(char *), countItems(commandP.identifier_one,commandP.identifier_two));
+    char **items = calloc(itemsCount, sizeof(char *));
     char *currentItem = strtok(start, splitter);
 
     size_t tmpLen;
     int counter = 0;
     while (strcmp(currentItem, commandP.identifier_two) != 0) {
         tmpLen = strlen(currentItem) + 1;
-        items[counter] = calloc(sizeof(char), tmpLen);
+        items[counter] = calloc(tmpLen, sizeof(char));
         strncpy(items[counter], currentItem, tmpLen);
         currentItem = strtok(NULL, splitter);
         counter++;
     }
 
-    // TODO form the right string in case of target. exp. add .py + " " + path and then call the add function.
-    if (commandP.isAddOrInteger) add(&config, items, save, toDeleteOrAdd[2], counter);
+    if (commandP.isAddOrInteger) {
+        if (commandP.newValuesCount == 2) {
+            size_t newStringSize = strlen(toDeleteOrAdd[2]) + strlen(toDeleteOrAdd[3]);
+            char *newString = calloc(newStringSize + 2, sizeof(char));
+            strcpy(newString, toDeleteOrAdd[2]);
+            strcat(newString, " ");
+            strcat(newString, toDeleteOrAdd[3]);
+
+            add(&config, items, save, newString, counter);
+            free(newString);
+        }
+        else add(&config, items, save, toDeleteOrAdd[2], counter);
+    }
     // TODO make the remove function.
 
     free(config);
@@ -172,17 +186,17 @@ void add(char **config,
          char *toAdd,
          int itemCount) {
 
-    char **tmp = calloc(sizeof(char *), itemCount + 2);
+    char **tmp = calloc(itemCount + 2, sizeof(char *));
     size_t totalSize = 0;
 
     // add the new item to the array.
     for (int item = 0; item < itemCount; item++) {
-        tmp[item] = calloc(sizeof(char), strlen(items[item]) + 2);
+        tmp[item] = calloc(strlen(items[item]) + 2, sizeof(char));
         strcpy(tmp[item], items[item]);
         strcat(tmp[item], "\n");
         free(items[item]);
     }
-    tmp[itemCount] = calloc(sizeof(char), strlen(toAdd) + 2);
+    tmp[itemCount] = calloc(strlen(toAdd) + 2, sizeof(char));
     strcpy(tmp[itemCount], toAdd);
     strcat(tmp[itemCount], "\n");
     free(items);
@@ -190,9 +204,9 @@ void add(char **config,
     // find the total size of items.
     for (int item = 0; item < itemCount + 1; item++) totalSize += sizeof(tmp[item]);
     // add the rest.
-    totalSize += strlen(*config) + strlen(missingPart) + strlen(toAdd) + 9;
+    totalSize += strlen(*config) + strlen(missingPart) + strlen(toAdd) + 1;
     // allocate space.
-    char *newConfig = calloc(sizeof(char), totalSize);
+    char *newConfig = calloc(totalSize, sizeof(char));
     // form the new config.
     strcpy(newConfig, *config);
     strcat(newConfig, "\n");
