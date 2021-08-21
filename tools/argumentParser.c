@@ -52,7 +52,7 @@ void parseArgs(int argc, char **argv) {
 
     if (strcmp(commands[commandIndex].type, SETTER_TYPE) == 0) setter(commands[commandIndex], argv[2]);
     else if (strcmp(commands[commandIndex].type, LIST_TYPE) == 0) listContent(commands[commandIndex]);
-    else if (strcmp(commands[commandIndex].type, ADD_REMOVE_TYPE) == 0) return;
+    else if (strcmp(commands[commandIndex].type, ADD_REMOVE_TYPE) == 0) addOrRemove(commands[commandIndex], argv);
 }
 
 int findCommand(char *name, int *resIndex) {
