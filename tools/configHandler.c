@@ -36,12 +36,13 @@ int readConfig(char **configContent) {
     strncpy(*configContent, buffer, configLen);
 
     free(buffer);
+    close(configFD);
     return 0;
 }
 
 int getConfig(int flag, size_t *configLen) {
     char *username = getlogin();
-    char *configPath = calloc(1, sizeof(char) * (strlen(CONFIG_PATH) + strlen(username) + strlen("home") + 3));
+    char *configPath = calloc(strlen(CONFIG_PATH) + strlen(username) + strlen("home") + 3, sizeof(char));
     struct stat configStat;
     int fd;
 

@@ -19,9 +19,11 @@
 #define LIST_TYPE "list"
 #define ADD_REMOVE_TYPE "add_remove"
 
+#define NUMBER_OF_COMMANDS 11
+
 // each row represent one command.
 // each column represent one property of this specific command.
-const struct commandP commands[11] = {
+const struct commandP commands[NUMBER_OF_COMMANDS] = {
         ADD_CHECK, ADD_REMOVE_TYPE, 0, "[check]", "[done_check]", 1, 1,
         ADD_TARGET, ADD_REMOVE_TYPE, 0, "[targets]", "[done_targets]", 1, 2,
         REMOVE_CHECK, ADD_REMOVE_TYPE, 0, "[check]", "[done_check]", 0, 1,
@@ -50,12 +52,12 @@ void parseArgs(int argc, char **argv) {
 
     if (strcmp(commands[commandIndex].type, SETTER_TYPE) == 0) setter(commands[commandIndex], argv[2]);
     else if (strcmp(commands[commandIndex].type, LIST_TYPE) == 0) listContent(commands[commandIndex]);
-    else if (strcmp(commands[commandIndex].type, ADD_REMOVE_TYPE) == 0) addOrRemove(commands[commandIndex], argv);
+    else if (strcmp(commands[commandIndex].type, ADD_REMOVE_TYPE) == 0) return;
 }
 
 int findCommand(char *name, int *resIndex) {
     // Find the command.
-    for (int command = 0; command < 11; command++) {
+    for (int command = 0; command < NUMBER_OF_COMMANDS; command++) {
         if (strcmp(commands[command].name, name) == 0) {
             *resIndex = command;
             return 0;
