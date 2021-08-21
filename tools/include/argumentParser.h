@@ -8,10 +8,11 @@ struct commandP {
     int index;
     char *identifier_one;
     char *identifier_two;
-    int isInteger;
+    int isAddOrInteger;
+    int newValuesCount;
 };
 
-void parseArgs(int argc, char** argv);
+void parseArgs(int argc, char **argv);
 
 
 #endif
