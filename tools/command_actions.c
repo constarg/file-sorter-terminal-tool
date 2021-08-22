@@ -2,9 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "include/command_actions.h"
-#include "include/config_handler.h"
-#include "include/argument_parser.h"
+#include <command/command_actions.h>
+#include <config/config_handler.h>
+#include <parsing/argument_parser.h>
 
 #define OPTION_NUMBER 5
 #define SPLITTER "\n"
@@ -105,7 +105,10 @@ void add_or_remove(struct command_p c_command_p, char **to_delete_or_add) {
     int item_count = count_items(location_of_interest, c_command_p.identifier_one, c_command_p.identifier_two);
 
     if (c_command_p.is_add_or_integer)
+        // TODO In case of a command that have two required arguments you have to build a string that contains those two.
         add(location_of_interest, item_count, options, c_command_p.identifier_one, c_command_p.identifier_two);
+
+    // TODO here you have to call the remove function.
 
     free(options);
     free(config);
@@ -124,8 +127,17 @@ void add(char *location_of_items,
     // temporary save the items in array.
     for (int item = 0; item < items_count; item++) items[item] = strtok(NULL, SPLITTER);
 
+    // TODO add the new item.
+
+    // TODO Find an efficient way to save the missing part of the config file \
+        right now the following ports of the config can be saved: \
+            - options.
+
     free(items);
 }
+
+// TODO make the remove function.
+
 
 int count_items(char *items, char *begin, char *end) {
     // copy the same items as the original, in the tmp.
@@ -145,12 +157,9 @@ int count_items(char *items, char *begin, char *end) {
     return count - 1;
 }
 
-void set_option(char *option,
-                char **options,
-                char *new_value,
-                int index,
-                char *missing,
-                size_t prev_conf_size) {
+void set_option(char *option, char **options,
+                       char *new_value, int index,
+                       char *missing, size_t prev_conf_size) {
 
     // Allocate space for the interested string.
     size_t new_option_size = strlen(option) + strlen(new_value) + 2;

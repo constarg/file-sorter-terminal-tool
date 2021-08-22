@@ -1,7 +1,7 @@
 #ifndef FILE_SORTER_TERMINAL_TOOL_COMMAND_ACTIONS_H
 #define FILE_SORTER_TERMINAL_TOOL_COMMAND_ACTIONS_H 1
 
-#include "argument_parser.h"
+#include <parsing/argument_parser.h>
 
 extern void help();
 
