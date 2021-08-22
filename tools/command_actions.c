@@ -44,11 +44,11 @@ void help() {
 }
 
 void setter(struct command_p c_command_p, char *new_value) {
-    replace_option(c_command_p.identifier_one, c_command_p.index, new_value, c_command_p.is_add_or_integer);
+    replace_option(c_command_p.id_one, c_command_p.index, new_value, c_command_p.is_add_or_integer);
 }
 
 void list_content(struct command_p c_command_p) {
-    list(c_command_p.identifier_one, c_command_p.identifier_two);
+    list(c_command_p.id_one, c_command_p.id_two);
 }
 
 void replace_option(char *option, int option_index, char *new_value, int is_integer) {
@@ -95,18 +95,18 @@ void add_or_remove(struct command_p c_command_p, char **to_delete_or_add) {
     char *tmp_options;
     char **options = calloc(OPTION_NUMBER, sizeof(char *));
     strcpy(tmp, config);
-    tmp_options = strstr(tmp, c_command_p.identifier_one);
+    tmp_options = strstr(tmp, c_command_p.id_one);
     options[0] = strtok(tmp_options, SPLITTER);
 
     for (int option = 1; option < OPTION_NUMBER; option++) options[option] = strtok(NULL, SPLITTER);
 
     // go to where the items is.
-    char *location_of_interest = strstr(config, c_command_p.identifier_one);
-    int item_count = count_items(location_of_interest, c_command_p.identifier_one, c_command_p.identifier_two);
+    char *location_of_interest = strstr(config, c_command_p.id_one);
+    int item_count = count_items(location_of_interest, c_command_p.id_one, c_command_p.id_two);
 
     if (c_command_p.is_add_or_integer)
         // TODO In case of a command that have two required arguments you have to build a string that contains those two.
-        add(location_of_interest, item_count, options, c_command_p.identifier_one, c_command_p.identifier_two);
+        add(location_of_interest, item_count, options, c_command_p.id_one, c_command_p.id_two);
 
     // TODO here you have to call the remove function.
 

@@ -6,10 +6,10 @@ struct command_p {
     char *name;
     char *type;
     int index;
-    char *identifier_one;
-    char *identifier_two;
+    char *id_one;
+    char *id_two;
     int is_add_or_integer;
-    int new_values_count;
+    int argc;
 };
 
 void parse_args(int argc, char **argv);

@@ -44,6 +44,7 @@
 #define LIST_TYPE "list"
 #define ADD_REMOVE_TYPE "add_remove"
 
+/* number of the commands*/
 #define NUMBER_OF_COMMANDS 11
 
 // each row represent one command.
@@ -73,7 +74,7 @@ void parse_args(int argc, char **argv) {
     // command not found.
     if (find_command(command_name, &command_index) == -1) help();
     // Command needs a new value, but no value has been set.
-    if ((argc - 2) < commands[command_index].new_values_count) help();
+    if ((argc - 2) < commands[command_index].argc) help();
 
     if (strcmp(commands[command_index].type, SETTER_TYPE) == 0) setter(commands[command_index], argv[2]);
     else if (strcmp(commands[command_index].type, LIST_TYPE) == 0) list_content(commands[command_index]);
