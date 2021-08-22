@@ -18,9 +18,9 @@
 
 /* identifier */
 #define CHECK_ID "[check]"
-#define CHECK_ID_D "[check_done]"
+#define CHECK_ID_D "[done_check]"
 #define TARGET_ID "[targets]"
-#define TARGET_ID_D "[targets_done]"
+#define TARGET_ID_D "[done_targets]"
 
 /* options */
 #define C_INTERVAL_OP "checkInterval"
@@ -44,7 +44,7 @@
 #define LIST_TYPE "list"
 #define ADD_REMOVE_TYPE "add_remove"
 
-/* number of the commands*/
+/* number of the commands. */
 #define NUMBER_OF_COMMANDS 11
 
 // each row represent one command.
@@ -58,7 +58,7 @@ const struct command_p commands[NUMBER_OF_COMMANDS] = {
         {SET_PARSE_INTERVAL,   SETTER_TYPE,     2, P_INTERVAL_OP, NULL,        isInteger,    ARGS_1},
         {SET_DEBUG_LOG,        SETTER_TYPE,     3, D_LOG_OP,      NULL,        isInteger,    ARGS_1},
         {SET_DEFAULT_DIR_PATH, SETTER_TYPE,     4, D_PATH_OP,     NULL,        isNotInteger, ARGS_1},
-        {LIST_CHECKS,          LIST_TYPE,       0, CHECK_ID,      TARGET_ID_D, isNotInteger, ARGS_0},
+        {LIST_CHECKS,          LIST_TYPE,       0, CHECK_ID,      CHECK_ID_D, isNotInteger, ARGS_0},
         {LIST_TARGETS,         LIST_TYPE,       0, TARGET_ID,     TARGET_ID_D, isNotInteger, ARGS_0},
         {LIST_OPTIONS,         LIST_TYPE,       0, C_INTERVAL_OP, CHECK_ID,    isNotInteger, ARGS_0}
 };
