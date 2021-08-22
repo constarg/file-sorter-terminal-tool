@@ -3,6 +3,7 @@
 #include <parsing/argument_parser.h>
 #include <command/command_actions.h>
 
+/* commands */
 #define ADD_CHECK "--add-check"
 #define ADD_TARGET "--add-target"
 #define SET_CHECK_INTERVAL "--set-check-interval"
@@ -15,6 +16,30 @@
 #define LIST_TARGETS "--list-targets"
 #define LIST_OPTIONS "--list-options"
 
+/* identifier */
+#define CHECK_ID "[check]"
+#define CHECK_ID_D "[check_done]"
+#define TARGET_ID "[targets]"
+#define TARGET_ID_D "[targets_done]"
+
+/* options */
+#define C_INTERVAL_OP "checkInterval"
+#define P_INTERVAL_OP "parseInterval"
+#define D_LOG_OP "debugLog"
+#define D_PATH_OP "default_dir_path"
+
+/* number of args  */
+#define ARGS_0 0
+#define ARGS_1 1
+#define ARGS_2 2
+
+/* helper bytes */
+#define isAdd 1
+#define isInteger 1
+#define isNotAdd 0
+#define isNotInteger 0
+
+/* type of the command */
 #define SETTER_TYPE "setter"
 #define LIST_TYPE "list"
 #define ADD_REMOVE_TYPE "add_remove"
@@ -24,17 +49,17 @@
 // each row represent one command.
 // each column represent one property of this specific command.
 const struct command_p commands[NUMBER_OF_COMMANDS] = {
-        {ADD_CHECK, ADD_REMOVE_TYPE, 0, "[check]", "[done_check]", 1, 1},
-        {ADD_TARGET, ADD_REMOVE_TYPE, 0, "[targets]", "[done_targets]", 1, 2},
-        {REMOVE_CHECK, ADD_REMOVE_TYPE, 0, "[check]", "[done_check]", 0, 1},
-        {REMOVE_TARGET, ADD_REMOVE_TYPE, 0, "[targets]", "[done_targets]", 0, 1},
-        {SET_CHECK_INTERVAL, SETTER_TYPE, 1, "checkInterval", NULL, 1, 1},
-        {SET_PARSE_INTERVAL, SETTER_TYPE, 2, "parseInterval", NULL, 1, 1},
-        {SET_DEBUG_LOG, SETTER_TYPE, 3, "debugLog", NULL, 1, 1},
-        {SET_DEFAULT_DIR_PATH, SETTER_TYPE, 4, "defaultDirPath", NULL, 0, 1},
-        {LIST_CHECKS, LIST_TYPE, 0, "[check]", "[done_check]", 0, 0},
-        {LIST_TARGETS, LIST_TYPE, 0, "[targets]", "[done_targets]", 0, 0},
-        {LIST_OPTIONS, LIST_TYPE, 0, "checkInterval", "[check]", 0, 0}
+        {ADD_CHECK,            ADD_REMOVE_TYPE, 0, CHECK_ID,      CHECK_ID_D,  isAdd,        ARGS_1},
+        {ADD_TARGET,           ADD_REMOVE_TYPE, 0, TARGET_ID,     TARGET_ID_D, isAdd,        ARGS_2},
+        {REMOVE_CHECK,         ADD_REMOVE_TYPE, 0, CHECK_ID,      CHECK_ID_D,  isNotAdd,     ARGS_1},
+        {REMOVE_TARGET,        ADD_REMOVE_TYPE, 0, TARGET_ID,     TARGET_ID_D, isNotAdd,     ARGS_1},
+        {SET_CHECK_INTERVAL,   SETTER_TYPE,     1, C_INTERVAL_OP, NULL,        isInteger,    ARGS_1},
+        {SET_PARSE_INTERVAL,   SETTER_TYPE,     2, P_INTERVAL_OP, NULL,        isInteger,    ARGS_1},
+        {SET_DEBUG_LOG,        SETTER_TYPE,     3, D_LOG_OP,      NULL,        isInteger,    ARGS_1},
+        {SET_DEFAULT_DIR_PATH, SETTER_TYPE,     4, D_PATH_OP,     NULL,        isNotInteger, ARGS_1},
+        {LIST_CHECKS,          LIST_TYPE,       0, CHECK_ID,      TARGET_ID_D, isNotInteger, ARGS_0},
+        {LIST_TARGETS,         LIST_TYPE,       0, TARGET_ID,     TARGET_ID_D, isNotInteger, ARGS_0},
+        {LIST_OPTIONS,         LIST_TYPE,       0, C_INTERVAL_OP, CHECK_ID,    isNotInteger, ARGS_0}
 };
 
 int find_command(char *, int *);

@@ -93,7 +93,7 @@ void add_or_remove(struct command_p c_command_p, char **to_delete_or_add) {
     // save the options.
     char *tmp = calloc(strlen(config) + 1, sizeof(char));
     char *tmp_options;
-    char **options = calloc(OPTION_NUMBER, sizeof(char*));
+    char **options = calloc(OPTION_NUMBER, sizeof(char *));
     strcpy(tmp, config);
     tmp_options = strstr(tmp, c_command_p.identifier_one);
     options[0] = strtok(tmp_options, SPLITTER);
@@ -121,7 +121,7 @@ void add(char *location_of_items,
          char *end) {
 
     // Allocate enough space for the previous item plus the new.
-    char **items = calloc(items_count + 1, sizeof(char*));
+    char **items = calloc(items_count + 1, sizeof(char *));
     strtok(location_of_items, SPLITTER);
 
     // temporary save the items in array.
@@ -158,8 +158,8 @@ int count_items(char *items, char *begin, char *end) {
 }
 
 void set_option(char *option, char **options,
-                       char *new_value, int index,
-                       char *missing, size_t prev_conf_size) {
+                char *new_value, int index,
+                char *missing, size_t prev_conf_size) {
 
     // Allocate space for the interested string.
     size_t new_option_size = strlen(option) + strlen(new_value) + 2;
@@ -171,8 +171,10 @@ void set_option(char *option, char **options,
 
     // calculate the size of the new config.
     size_t old_option_size = strlen(options[index]);
-    size_t def_of_size = (new_option_size > old_option_size) ? (new_option_size - old_option_size) : (old_option_size - new_option_size);
-    size_t new_conf_size = (new_option_size > old_option_size) ? (prev_conf_size + def_of_size) : (prev_conf_size - def_of_size);
+    size_t def_of_size = (new_option_size > old_option_size) ? (new_option_size - old_option_size) : (old_option_size -
+                                                                                                      new_option_size);
+    size_t new_conf_size = (new_option_size > old_option_size) ? (prev_conf_size + def_of_size) : (prev_conf_size -
+                                                                                                   def_of_size);
 
     // temporary save the changed option.
     options[index] = changed_option;
