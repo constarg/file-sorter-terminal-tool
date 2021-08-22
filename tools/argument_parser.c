@@ -1,7 +1,7 @@
 #include <string.h>
 
-#include "include/argument_parser.h"
-#include "include/command_actions.h"
+#include <parsing/argument_parser.h>
+#include <command/command_actions.h>
 
 #define ADD_CHECK "--add-check"
 #define ADD_TARGET "--add-target"
@@ -24,17 +24,17 @@
 // each row represent one command.
 // each column represent one property of this specific command.
 const struct command_p commands[NUMBER_OF_COMMANDS] = {
-        ADD_CHECK, ADD_REMOVE_TYPE, 0, "[check]", "[done_check]", 1, 1,
-        ADD_TARGET, ADD_REMOVE_TYPE, 0, "[targets]", "[done_targets]", 1, 2,
-        REMOVE_CHECK, ADD_REMOVE_TYPE, 0, "[check]", "[done_check]", 0, 1,
-        REMOVE_TARGET, ADD_REMOVE_TYPE, 0, "[targets]", "[done_targets]", 0, 1,
-        SET_CHECK_INTERVAL, SETTER_TYPE, 1, "checkInterval", NULL, 1, 1,
-        SET_PARSE_INTERVAL, SETTER_TYPE, 2, "parseInterval", NULL, 1, 1,
-        SET_DEBUG_LOG, SETTER_TYPE, 3, "debugLog", NULL, 1, 1,
-        SET_DEFAULT_DIR_PATH, SETTER_TYPE, 4, "defaultDirPath", NULL, 0, 1,
-        LIST_CHECKS, LIST_TYPE, 0, "[check]", "[done_check]", 0, 0,
-        LIST_TARGETS, LIST_TYPE, 0, "[targets]", "[done_targets]", 0, 0,
-        LIST_OPTIONS, LIST_TYPE, 0, "checkInterval", "[check]", 0, 0
+        {ADD_CHECK, ADD_REMOVE_TYPE, 0, "[check]", "[done_check]", 1, 1},
+        {ADD_TARGET, ADD_REMOVE_TYPE, 0, "[targets]", "[done_targets]", 1, 2},
+        {REMOVE_CHECK, ADD_REMOVE_TYPE, 0, "[check]", "[done_check]", 0, 1},
+        {REMOVE_TARGET, ADD_REMOVE_TYPE, 0, "[targets]", "[done_targets]", 0, 1},
+        {SET_CHECK_INTERVAL, SETTER_TYPE, 1, "checkInterval", NULL, 1, 1},
+        {SET_PARSE_INTERVAL, SETTER_TYPE, 2, "parseInterval", NULL, 1, 1},
+        {SET_DEBUG_LOG, SETTER_TYPE, 3, "debugLog", NULL, 1, 1},
+        {SET_DEFAULT_DIR_PATH, SETTER_TYPE, 4, "defaultDirPath", NULL, 0, 1},
+        {LIST_CHECKS, LIST_TYPE, 0, "[check]", "[done_check]", 0, 0},
+        {LIST_TARGETS, LIST_TYPE, 0, "[targets]", "[done_targets]", 0, 0},
+        {LIST_OPTIONS, LIST_TYPE, 0, "checkInterval", "[check]", 0, 0}
 };
 
 int find_command(char *, int *);
