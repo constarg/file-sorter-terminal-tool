@@ -6,12 +6,12 @@
 #include <config/config_handler.h>
 #include <parsing/argument_parser.h>
 
-#define OPTION_NUMBER 5
-#define SPLITTER "\n"
+#define OPTION_NUMBER           5
+#define SPLITTER                "\n"
 
-#define TARGET_IDENTIFIER "[targets]"
-#define CHECK_IDENTIFIER "[check]"
-#define CHECK_DONE_IDENTIFIER "[done_check]"
+#define TARGET_IDENTIFIER       "[targets]"
+#define CHECK_IDENTIFIER        "[check]"
+#define CHECK_DONE_IDENTIFIER   "[done_check]"
 
 void list(char *begin, char *end);
 
@@ -19,9 +19,11 @@ void replace_option(char *option, int option_index, char *new_value, int is_inte
 
 void set_option(char *option, char **options, char *new_value, int index, char *missing, size_t prev_conf_size);
 
-void add(char *location_of_items, int items_count, char **options, char *begin, char *end);
+void add(char *location_of_items, char *to_add, int items_count, char **options, char *begin, char *end);
 
 int is_valid_int_value(char *value, char **result, int return_int_res);
+
+char *get_missing_part(char *location_of_items, char *begin, char *end, int item_count);
 
 int count_items(char *items, char *begin, char *end);
 
@@ -106,35 +108,85 @@ void add_or_remove(struct command_p c_command_p, char **to_delete_or_add) {
 
     if (c_command_p.is_add_or_integer)
         // TODO In case of a command that have two required arguments you have to build a string that contains those two.
-        add(location_of_interest, item_count, options, c_command_p.id_one, c_command_p.id_two);
+        add(location_of_interest, to_delete_or_add[2], item_count, options, c_command_p.id_one, c_command_p.id_two);
 
     // TODO here you have to call the remove function.
 
     free(options);
+    free(tmp);
     free(config);
 }
 
 void add(char *location_of_items,
+         char *to_add,
          int items_count,
          char **options,
          char *begin,
          char *end) {
 
+    char *missing_part = get_missing_part(location_of_items, begin, end, items_count);
+
     // Allocate enough space for the previous item plus the new.
-    char **items = calloc(items_count + 1, sizeof(char *));
+    char **items = calloc(items_count + 2, sizeof(char *));
     strtok(location_of_items, SPLITTER);
 
+    int curr_item_index = 0;
     // temporary save the items in array.
     for (int item = 0; item < items_count; item++) items[item] = strtok(NULL, SPLITTER);
-
-    // TODO add the new item.
-
-    // TODO Find an efficient way to save the missing part of the config file \
-        right now the following ports of the config can be saved: \
-            - options.
+    items[items_count] = to_add;
+    items[items_count + 1] = end;
 
     free(items);
+    free(missing_part);
 }
+
+char *get_missing_part(char *location_of_items, char *begin, char *end, int item_count) {
+    // BackUp the items.
+    char *tmp = calloc(strlen(location_of_items) + 1, sizeof(char));
+    strcpy(tmp, location_of_items);
+
+    char *missing_part;
+    char *start = strstr(tmp, begin);
+    if (strcmp(begin, TARGET_IDENTIFIER) == 0) {
+        missing_part = calloc(strlen(start) + 1, sizeof(char));
+        strcpy(missing_part, start);
+        free(tmp);
+        return missing_part;
+    }
+    // if check.
+    // store all the check items.
+    char **items_tmp = calloc(item_count + 1, sizeof(char *));
+    start = strtok(start, SPLITTER);
+
+    // save the items.
+    int curr_item = 0;
+    size_t curr_len;
+    size_t total_len = 0;
+    while (strcmp(start, end) != 0) {
+        curr_len = strlen(start);
+        items_tmp[curr_item] = calloc(curr_len + 1, sizeof(char));
+        strcpy(items_tmp[curr_item], start);
+        start = strtok(NULL, SPLITTER);
+        total_len += curr_len;
+        curr_item++;
+    }
+    // allocate enough space in tmp and form the missing string.
+    missing_part = calloc(total_len + strlen(end) + item_count + 3, sizeof(char));
+    // save the items.
+    for (int item = 0; item < item_count + 1; item++) {
+        strcat(missing_part, items_tmp[item]);
+        strcat(missing_part, "\n");
+    }
+    strcat(missing_part, end);
+    strcat(missing_part, "\n");
+
+    for (int item = 0; item < item_count + 1; item++) free(items_tmp[item]);
+    free(items_tmp);
+    free(tmp);
+
+    return missing_part;
+}
+
 
 // TODO make the remove function.
 
