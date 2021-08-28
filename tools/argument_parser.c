@@ -50,17 +50,17 @@
 // each row represent one command.
 // each column represent one property of this specific command.
 const struct command_p commands[NUMBER_OF_COMMANDS] = {
-        {ADD_CHECK,            ADD_REMOVE_TYPE, 0, CHECK_ID,      CHECK_ID_D,  IS_ADD,         ARGS_1},
-        {ADD_TARGET,           ADD_REMOVE_TYPE, 0, TARGET_ID,     TARGET_ID_D, IS_ADD,         ARGS_2},
-        {REMOVE_CHECK,         ADD_REMOVE_TYPE, 0, CHECK_ID,      CHECK_ID_D,  IS_NOT_ADD,     ARGS_1},
-        {REMOVE_TARGET,        ADD_REMOVE_TYPE, 0, TARGET_ID,     TARGET_ID_D, IS_NOT_ADD,     ARGS_1},
-        {SET_CHECK_INTERVAL,   SETTER_TYPE,     1, C_INTERVAL_OP, NULL,        IS_INTEGER,     ARGS_1},
-        {SET_PARSE_INTERVAL,   SETTER_TYPE,     2, P_INTERVAL_OP, NULL,        IS_INTEGER,     ARGS_1},
-        {SET_DEBUG_LOG,        SETTER_TYPE,     3, D_LOG_OP,      NULL,        IS_INTEGER,     ARGS_1},
-        {SET_DEFAULT_DIR_PATH, SETTER_TYPE,     4, D_PATH_OP,     NULL,        IS_NOT_INTEGER, ARGS_1},
-        {LIST_CHECKS,          LIST_TYPE,       0, CHECK_ID,      CHECK_ID_D,  IS_NOT_INTEGER, ARGS_0},
-        {LIST_TARGETS,         LIST_TYPE,       0, TARGET_ID,     TARGET_ID_D, IS_NOT_INTEGER, ARGS_0},
-        {LIST_OPTIONS,         LIST_TYPE,       0, C_INTERVAL_OP, CHECK_ID,    IS_NOT_INTEGER, ARGS_0}
+        {ADD_CHECK,            ADD_REMOVE_TYPE, 0, CHECK_ID,      CHECK_ID_D,   IS_ADD,         ARGS_1},
+        {ADD_TARGET,           ADD_REMOVE_TYPE, 0, TARGET_ID,     TARGET_ID_D,  IS_ADD,         ARGS_2},
+        {REMOVE_CHECK,         ADD_REMOVE_TYPE, 0, CHECK_ID,      CHECK_ID_D,   IS_NOT_ADD,     ARGS_1},
+        {REMOVE_TARGET,        ADD_REMOVE_TYPE, 0, TARGET_ID,     TARGET_ID_D,  IS_NOT_ADD,     ARGS_1},
+        {SET_CHECK_INTERVAL,   SETTER_TYPE,     1, C_INTERVAL_OP, NULL,         IS_INTEGER,     ARGS_1},
+        {SET_PARSE_INTERVAL,   SETTER_TYPE,     2, P_INTERVAL_OP, NULL,         IS_INTEGER,     ARGS_1},
+        {SET_DEBUG_LOG,        SETTER_TYPE,     3, D_LOG_OP,      NULL,  	IS_INTEGER,     ARGS_1},
+        {SET_DEFAULT_DIR_PATH, SETTER_TYPE,     4, D_PATH_OP,     NULL, 	IS_NOT_INTEGER, ARGS_1},
+        {LIST_CHECKS,          LIST_TYPE,       0, CHECK_ID,      CHECK_ID_D,   IS_NOT_INTEGER, ARGS_0},
+        {LIST_TARGETS,         LIST_TYPE,       0, TARGET_ID,     TARGET_ID_D,  IS_NOT_INTEGER, ARGS_0},
+        {LIST_OPTIONS,         LIST_TYPE,       0, C_INTERVAL_OP, CHECK_ID,     IS_NOT_INTEGER, ARGS_0}
 };
 
 int find_command(char *, int *);

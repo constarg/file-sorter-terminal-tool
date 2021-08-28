@@ -8,7 +8,7 @@
 
 #define OPTION_NUMBER           5
 #define SPLITTER                "\n"
-#define CHANGE_LINE		        "\n"
+#define CHANGE_LINE             "\n"
 
 #define TARGET_IDENTIFIER       "[targets]"
 #define CHECK_IDENTIFIER        "[check]"
@@ -22,11 +22,13 @@ void replace_option(char *option, int option_index, char *new_value, int is_inte
 
 void set_option(char *option, char **options, char *new_value, int index, char *missing, size_t prev_conf_size);
 
-void add(char *location_of_items, char *missing, char *to_add, int items_count, char **options, char *begin, char *end);
+void add_remove(char *location_of_items, char *missing, char *to_add, int items_count, char **options, char *begin, char *end, char *remove);
 
 int is_valid_int_value(char *value, char **result, int return_int_res);
 
 char *convert_array_to_string(char **array, int array_size);
+
+void save(char **options, char **items, char *missing, char *begin, int items_count);
 
 char *get_missing_part(char *config, char *begin, char *end, int item_count);
 
@@ -120,42 +122,78 @@ void add_or_remove(struct command_p c_command_p, char **to_delete_or_add) {
             strcat(to_add, " ");
             strcat(to_add, to_delete_or_add[3]);
             // in case of target.
-            add(location_of_interest, missing_part, to_add, item_count, options, c_command_p.id_one, c_command_p.id_two);
-        }
-        else {
-            add(location_of_interest, missing_part, to_delete_or_add[2], item_count, options, c_command_p.id_one, c_command_p.id_two);
+            add_remove(location_of_interest, missing_part, to_add, item_count, options, c_command_p.id_one, c_command_p.id_two, NULL);
+
+            free(to_add);
+        } else {
+            add_remove(location_of_interest, missing_part, to_delete_or_add[2], item_count, options, c_command_p.id_one, c_command_p.id_two, NULL);
         }
 
+    } else {
+        add_remove(location_of_interest, missing_part, NULL, item_count, options, c_command_p.id_one, c_command_p.id_two, to_delete_or_add[2]);
     }
-
-    // TODO here you have to call the remove function.
 
     free(options);
     free(tmp);
     free(config);
 }
 
-void add(char *location_of_items,
+void add_remove(char *location_of_items,
          char *missing,
          char *to_add,
          int items_count,
          char **options,
          char *begin,
-         char *end) {
+         char *end,
+         char *remove) {
 
     // Allocate enough space for the previous item plus the new.
-    char **items = calloc(items_count + 2, sizeof(char *));
-    strtok(location_of_items, SPLITTER);
+    char **items;
 
-    int curr_item_index = 0;
-    // temporary save the items in array.
-    for (int item = 0; item < items_count; item++) items[item] = strtok(NULL, SPLITTER);
-    items[items_count] = to_add;
-    items[items_count + 1] = end;
+    if (remove != NULL) {
+        // convert to int.
+        int remove_int = strtol(remove, &remove, 10);
+        if (remove_int == 0 && remove[0] != '0') return;
+
+        items = calloc(items_count, sizeof(char *));
+        strtok(location_of_items, SPLITTER);
+
+        for (int item = 0; item <= items_count - 1; item++) {
+            if (item == remove_int - 1) {
+                strtok(NULL, SPLITTER);
+                items[item] = strtok(NULL, SPLITTER);
+                continue;
+            }
+
+            items[item] = strtok(NULL, SPLITTER);
+        }
+        items[items_count] = end;
+    } else {
+        items = calloc(items_count + 2, sizeof(char *));
+        strtok(location_of_items, SPLITTER);
+        // temporary save the items in array.
+        for (int item = 0; item < items_count; item++) items[item] = strtok(NULL, SPLITTER);
+        items[items_count] = to_add;
+        items[items_count + 1] = end;
+        items_count += 2;
+    }
+
+    // save the changes.
+    save(options, items, missing, begin, items_count);
+
+}
+
+void save(char **options,
+          char **items,
+          char *missing,
+          char *begin,
+          int items_count) {
 
     // get the required strings.
     char *options_string_form = convert_array_to_string(options, OPTION_NUMBER);
-    char *items_string_form = convert_array_to_string(items, items_count + 2);
+    char *items_string_form = convert_array_to_string(items, items_count);
+
+    if (options_string_form == NULL || items_string_form == NULL) return;
 
     // calculate the size of the new config.
     size_t new_config_size = strlen(options_string_form) + strlen(items_string_form) + strlen(missing) + strlen(begin);
@@ -173,8 +211,7 @@ void add(char *location_of_items,
         strcat(new_config, begin);
         strcat(new_config, CHANGE_LINE);
         strcat(new_config, items_string_form);
-    }
-    else {
+    } else {
         strcat(new_config, begin);
         strcat(new_config, CHANGE_LINE);
         strcat(new_config, items_string_form);
@@ -184,11 +221,13 @@ void add(char *location_of_items,
 
     write_config(new_config, new_config_size + 3);
 
+    free(items);
     free(options_string_form);
     free(items_string_form);
     free(new_config);
     free(missing);
 }
+
 
 char *get_missing_part(char *config, char *begin, char *end, int item_count) {
     // BackUp the items.
@@ -243,6 +282,12 @@ char *get_missing_part(char *config, char *begin, char *end, int item_count) {
 char *convert_array_to_string(char **array, int array_size) {
     size_t total_size = 0;
 
+    if (array_size == 1) {
+        char *tmp = calloc(strlen(array[0]) + 1, sizeof(char));
+        strcpy(tmp, array[0]);
+        return tmp;
+    }
+
     // calculate the total size of the new string.
     for (int element = 0; element < array_size; element++) total_size += strlen(array[element]);
 
@@ -254,12 +299,8 @@ char *convert_array_to_string(char **array, int array_size) {
         strcat(string_form, CHANGE_LINE);
     }
 
-
     return string_form;
 }
-
-// TODO make the remove function.
-
 
 int count_items(char *items, char *begin, char *end) {
     // copy the same items as the original, in the tmp.
