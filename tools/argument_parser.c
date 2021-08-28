@@ -4,29 +4,29 @@
 #include <command/command_actions.h>
 
 /* commands */
-#define ADD_CHECK "--add-check"
-#define ADD_TARGET "--add-target"
-#define SET_CHECK_INTERVAL "--set-check-interval"
-#define SET_PARSE_INTERVAL "--set-parse-interval"
-#define SET_DEBUG_LOG "--set-debug-log"
-#define SET_DEFAULT_DIR_PATH "--set-default-dir-path"
-#define REMOVE_CHECK "--remove-check"
-#define REMOVE_TARGET "--remove-target"
-#define LIST_CHECKS "--list-checks"
-#define LIST_TARGETS "--list-targets"
-#define LIST_OPTIONS "--list-options"
+#define ADD_CHECK               "--add-check"
+#define ADD_TARGET              "--add-target"
+#define SET_CHECK_INTERVAL      "--set-check-interval"
+#define SET_PARSE_INTERVAL      "--set-parse-interval"
+#define SET_DEBUG_LOG           "--set-debug-log"
+#define SET_DEFAULT_DIR_PATH    "--set-default-dir-path"
+#define REMOVE_CHECK            "--remove-check"
+#define REMOVE_TARGET           "--remove-target"
+#define LIST_CHECKS             "--list-checks"
+#define LIST_TARGETS            "--list-targets"
+#define LIST_OPTIONS            "--list-options"
 
 /* identifier */
-#define CHECK_ID "[check]"
-#define CHECK_ID_D "[done_check]"
-#define TARGET_ID "[targets]"
-#define TARGET_ID_D "[done_targets]"
+#define CHECK_ID                "[check]"
+#define CHECK_ID_D              "[done_check]"
+#define TARGET_ID               "[targets]"
+#define TARGET_ID_D             "[done_targets]"
 
 /* options */
-#define C_INTERVAL_OP "checkInterval"
-#define P_INTERVAL_OP "parseInterval"
-#define D_LOG_OP "debugLog"
-#define D_PATH_OP "default_dir_path"
+#define C_INTERVAL_OP           "checkInterval"
+#define P_INTERVAL_OP           "parseInterval"
+#define D_LOG_OP                "debugLog"
+#define D_PATH_OP               "default_dir_path"
 
 /* number of args  */
 #define ARGS_0 0
@@ -58,7 +58,7 @@ const struct command_p commands[NUMBER_OF_COMMANDS] = {
         {SET_PARSE_INTERVAL,   SETTER_TYPE,     2, P_INTERVAL_OP, NULL,        isInteger,    ARGS_1},
         {SET_DEBUG_LOG,        SETTER_TYPE,     3, D_LOG_OP,      NULL,        isInteger,    ARGS_1},
         {SET_DEFAULT_DIR_PATH, SETTER_TYPE,     4, D_PATH_OP,     NULL,        isNotInteger, ARGS_1},
-        {LIST_CHECKS,          LIST_TYPE,       0, CHECK_ID,      CHECK_ID_D, isNotInteger, ARGS_0},
+        {LIST_CHECKS,          LIST_TYPE,       0, CHECK_ID,      CHECK_ID_D,  isNotInteger, ARGS_0},
         {LIST_TARGETS,         LIST_TYPE,       0, TARGET_ID,     TARGET_ID_D, isNotInteger, ARGS_0},
         {LIST_OPTIONS,         LIST_TYPE,       0, C_INTERVAL_OP, CHECK_ID,    isNotInteger, ARGS_0}
 };
