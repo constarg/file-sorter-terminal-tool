@@ -110,7 +110,7 @@ void add_or_remove(struct command_p c_command_p, char **to_delete_or_add) {
     options[1] = strtok(tmp_options, SPLITTER);
     for (int option = 2; option < OPTION_NUMBER; option++) options[option] = strtok(NULL, SPLITTER);
 
-    // go to where the items is.
+    // go to where the items.
     char *location_of_interest = strstr(config, c_command_p.id_one);
     int item_count = count_items(location_of_interest, c_command_p.id_one, c_command_p.id_two);
     char *missing_part = get_missing_part(config, c_command_p.id_one, c_command_p.id_two, item_count);
@@ -151,16 +151,19 @@ void add_remove(char *location_of_items,
     char **items;
 
     if (remove != NULL) {
+        if (items_count == 0) return;
         // convert to int.
         int remove_int = strtol(remove, &remove, 10);
-        if (remove_int == 0 && remove[0] != '0') return;
 
-        items = calloc(items_count, sizeof(char *));
+        if (remove_int == 0 && remove[0] != '0') return;
+        if (remove_int > items_count) return;
+
+        items = calloc(items_count + 1, sizeof(char *));
         strtok(location_of_items, SPLITTER);
 
-        for (int item = 0; item <= items_count - 1; item++) {
-            if (item == remove_int - 1) {
-                strtok(NULL, SPLITTER);
+        for (int item = 0; item < items_count; item++) {
+            if (item + 1 == remove_int) {
+                if (strcmp(strtok(NULL, SPLITTER), end) == 0) return;
                 items[item] = strtok(NULL, SPLITTER);
                 continue;
             }
@@ -180,7 +183,6 @@ void add_remove(char *location_of_items,
 
     // save the changes.
     save(options, items, missing, begin, items_count);
-
 }
 
 void save(char **options,
@@ -198,7 +200,7 @@ void save(char **options,
     // calculate the size of the new config.
     size_t new_config_size = strlen(options_string_form) + strlen(items_string_form) + strlen(missing) + strlen(begin);
     // allocate the space for the new config.
-    char *new_config = calloc(new_config_size + 6, sizeof(char));
+    char *new_config = calloc(new_config_size + 7, sizeof(char));
 
     // build the config.
     // set options.
@@ -208,6 +210,7 @@ void save(char **options,
     if (strcmp(begin, TARGET_IDENTIFIER) == 0) {
         strcat(new_config, missing);
         strcat(new_config, CHANGE_LINE);
+        strcat(new_config, CHANGE_LINE);
         strcat(new_config, begin);
         strcat(new_config, CHANGE_LINE);
         strcat(new_config, items_string_form);
@@ -216,10 +219,11 @@ void save(char **options,
         strcat(new_config, CHANGE_LINE);
         strcat(new_config, items_string_form);
         strcat(new_config, CHANGE_LINE);
+        strcat(new_config, CHANGE_LINE);
         strcat(new_config, missing);
     }
 
-    write_config(new_config, new_config_size + 3);
+    write_config(new_config, new_config_size + 4);
 
     free(items);
     free(options_string_form);
@@ -270,7 +274,6 @@ char *get_missing_part(char *config, char *begin, char *end, int item_count) {
     }
     strcat(missing_part, CHANGE_LINE);
     strcat(missing_part, CHECK_DONE_IDENTIFIER);
-    strcat(missing_part, CHANGE_LINE);
 
     for (int item = 0; item < curr_item; item++) free(items_tmp[item]);
     free(items_tmp);
@@ -390,7 +393,7 @@ void list(char *begin, char *end) {
                 curr_item = strtok(NULL, SPLITTER);
                 continue;
             }
-            printf("[*] [%d] %s\n", counter, curr_item);
+            printf(" [%d] %s\n", counter, curr_item);
             curr_item = strtok(NULL, SPLITTER);
             counter++;
         }
