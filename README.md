@@ -32,5 +32,5 @@ Command |  Description
 `sorter --list-targets` | Displays all the elements that describe what the program does for a file. 
 `sorter --list-options` | Displays the program options.
 
-For more information on what each of the fields is, please read the core readme below: 
+For more information on what each of the fields is, please read the core readme below:<br>
 https://github.com/rounnus/File-Sorter-Core
