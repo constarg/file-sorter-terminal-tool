@@ -10,6 +10,7 @@
 #define SET_PARSE_INTERVAL      "--set-parse-interval"
 #define SET_DEBUG_LOG           "--set-debug-log"
 #define SET_DEFAULT_DIR_PATH    "--set-default-dir-path"
+#define SET_ENABLE_DEF_DIR      "--set-enable-default-dir"
 #define REMOVE_CHECK            "--remove-check"
 #define REMOVE_TARGET           "--remove-target"
 #define LIST_CHECKS             "--list-checks"
@@ -23,10 +24,11 @@
 #define TARGET_ID_D             "[done_targets]"
 
 /* options */
-#define C_INTERVAL_OP           "checkInterval"
-#define P_INTERVAL_OP           "parseInterval"
-#define D_LOG_OP                "debugLog"
+#define C_INTERVAL_OP           "check_interval"
+#define P_INTERVAL_OP           "parse_interval"
+#define D_LOG_OP                "debug_log"
 #define D_PATH_OP               "default_dir_path"
+#define D_ENABL_OP              "enable_default_path"
 
 /* number of args  */
 #define ARGS_0                  0
@@ -45,7 +47,7 @@
 #define ADD_REMOVE_TYPE         "add_remove"
 
 /* number of the commands. */
-#define NUMBER_OF_COMMANDS 11
+#define NUMBER_OF_COMMANDS 12
 
 // each row represent one command.
 // each column represent one property of this specific command.
@@ -58,6 +60,7 @@ const struct command_p commands[NUMBER_OF_COMMANDS] = {
         {SET_PARSE_INTERVAL,   SETTER_TYPE,     2, P_INTERVAL_OP, NULL,         IS_INTEGER,     ARGS_1},
         {SET_DEBUG_LOG,        SETTER_TYPE,     3, D_LOG_OP,      NULL,  	IS_INTEGER,     ARGS_1},
         {SET_DEFAULT_DIR_PATH, SETTER_TYPE,     4, D_PATH_OP,     NULL, 	IS_NOT_INTEGER, ARGS_1},
+        {SET_ENABLE_DEF_DIR,   SETTER_TYPE,     5, D_ENABL_OP,    NULL,         IS_INTEGER, ARGS_1},
         {LIST_CHECKS,          LIST_TYPE,       0, CHECK_ID,      CHECK_ID_D,   IS_NOT_INTEGER, ARGS_0},
         {LIST_TARGETS,         LIST_TYPE,       0, TARGET_ID,     TARGET_ID_D,  IS_NOT_INTEGER, ARGS_0},
         {LIST_OPTIONS,         LIST_TYPE,       0, C_INTERVAL_OP, CHECK_ID,     IS_NOT_INTEGER, ARGS_0}
