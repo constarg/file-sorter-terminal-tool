@@ -1,7 +1,7 @@
 # File-Sorter-Terminal-Tool
 File sorter management tool. https://github.com/rounnus/File-Sorter-Core
 # Download & Build
-First download the program from github and go to the File-Sorter-Core folder.
+First download the program from github and go to the File-Sorter-Terminal-Tool folder.
 ```
 % git clone https://github.com/rounnus/File-Sorter-Terminal-Tool
 % cd File-Sorter-Terminal-Tool/
