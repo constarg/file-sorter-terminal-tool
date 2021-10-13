@@ -6,15 +6,6 @@
 #include <config/config_handler.h>
 #include <parsing/argument_parser.h>
 
-#define OPTION_NUMBER           6
-#define SPLITTER                "\n"
-#define CHANGE_LINE             "\n"
-
-#define TARGET_IDENTIFIER       "[targets]"
-#define CHECK_IDENTIFIER        "[check]"
-#define CHECK_DONE_IDENTIFIER   "[done_check]"
-
-#define OPTIONS_START           "check_interval"
 
 void help() {
 
@@ -35,14 +26,8 @@ void help() {
     exit(0);
 }
 
-void setter(struct command_p c_command_p, char *new_value) {
 
-}
-
-void list_content(struct command_p c_command_p) {
-
-}
-
-void list(char *begin, char *end) {
-
-}
+// TODO - Make function to list contents.
+// TODO - Make function to set new value to an option.
+// TODO - Make function to add check/targets.
+// TODO - Make function to remove check/targets.
