@@ -3,13 +3,7 @@
 
 // commands properties.
 struct command_p {
-    char *name;
-    char *type;
-    int index;
-    char *id_one;
-    char *id_two;
-    int is_add_or_integer;
-    int argc;
+    // TODO - make the struct.
 };
 
 void parse_args(int argc, char **argv);
