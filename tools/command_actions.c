@@ -6,24 +6,18 @@
 #include <command/command_actions.h>
 #include <config/config_handler.h>
 #include <parsing/argument_parser.h>
+#include <mem/mem.h>
 
 #define INSTRUCTION_ARRAY_S 12
 
-#define GET_COMMAND_INSTRUCTIONS(RESULT, C_NAME, INSTRUCTION_ARRAY) do {                \
-        for (int instruction = 0; instructon < INSTRUCTION_ARRAY_S; instruction++) {    \
-            if (strcmp(INSTRUCTION_ARRAY[instruciton], C_NAME) == 0)                    \
-                RESULT = INSTRUCTION_ARRAY[instruction];                                \
-        }                                                                               \
-    } while (0)
-
-
 struct command_instructions {
-    char *c_name;          // command name.
-    char *c_attributes[2]; // command attributes.
+    char  *c_name;          // command name.
+    char  *c_attributes[2]; // command attributes.
 };
 
 // TODO - Fill the below array.
 struct command_instructions c_instructions_array[INSTRUCTION_ARRAY_S] = {
+        {.c_name = LIST_CHECKS, .c_attributes[0] = CHECK_ID, .c_attributes[1] = CHECK_ID_D}
 };
 
 
@@ -46,9 +40,45 @@ void help() {
     exit(0);
 }
 
+static inline int get_instructions(const char *c_name) {
+    for (int instructions = 0; instructions < INSTRUCTION_ARRAY_S; instructions++) {
+        if (strcmp(c_instructions_array[instructions].c_name, c_name) == 0)
+            return instructions;
+    }
+
+    return -1;
+}
+
 
 void list_command(const char *what_to_list) {
-    // TODO - List the contents of the @what_to_list.
+    int index_of_instruction = get_instructions(what_to_list);
+    if (index_of_instruction == -1) return;
+
+    struct command_instructions instructions = c_instructions_array[index_of_instruction];
+    // Read the config file.
+    char *config = read_config();
+    if (config == NULL) return;
+
+    char *location_of_interest = strstr(config, instructions.c_attributes[0]);
+    if (!location_of_interest) {
+        free(config);
+        return;
+    }
+
+    // Make a copy of the location_of_interest, so we do not break the data of config.
+    char tmp[strlen(location_of_interest + 1)];
+    strcpy(tmp, location_of_interest);
+
+    char *current_element = strtok(location_of_interest, "\n");
+    int counter = 0;
+
+    while (current_element != NULL) {
+        printf("%d: %s\n", counter, current_element);
+        counter++;
+        current_element = strtok(NULL, "\n");
+    }
+
+    free(config);
 }
 
 void set_value(const char *option, const char *new_value) {
