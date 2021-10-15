@@ -70,11 +70,11 @@ void list_command(const char *what_to_list) {
     strcpy(tmp, location_of_interest);
 
     char *current_element = strtok(location_of_interest, "\n");
-    int counter = 0;
+    int row = 0;
 
-    while (current_element != NULL) {
-        printf("%d: %s\n", counter, current_element);
-        counter++;
+    while (current_element != NULL && strcmp(current_element, instructions.c_attributes[1]) != 0) {
+        printf("%d: %s\n", row, current_element);
+        row++;
         current_element = strtok(NULL, "\n");
     }
 
