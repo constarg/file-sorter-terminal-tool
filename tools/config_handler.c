@@ -46,22 +46,27 @@ int write_config(char *changes, size_t changesLen) {
 }
 
 char *read_config() {
-    size_t config_len;
+    size_t config_len = 0;
     int config_fd = get_config(O_RDONLY, &config_len);
 
     if (config_fd == -1) return NULL;
     if (config_len == -1) return NULL;
 
-    char buffer[config_len];
-    if (read(config_fd, buffer, config_len) == -1) return NULL;
+    char *buffer;
+    ALLOCATE_MEMORY(buffer, config_len + 1, sizeof(char));
+    if (read(config_fd, buffer, config_len) == -1) {
+        free(buffer);
+        return NULL;
+    }
 
     size_t config_content_s = config_len + 1;
-    char *config_content;
+    char *config_content = NULL;
     ALLOCATE_MEMORY(config_content, config_content_s, sizeof(char));
     strcpy(config_content, buffer);
 
     close(config_fd);
 
+    free(buffer);
     return config_content;
 }
 

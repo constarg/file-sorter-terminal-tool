@@ -8,6 +8,9 @@
 #include <parsing/argument_parser.h>
 #include <mem/mem.h>
 
+#define TRUE  1
+#define FALSE 0
+
 #define INSTRUCTION_ARRAY_S 12
 
 struct command_instructions {
@@ -17,6 +20,7 @@ struct command_instructions {
 
 // TODO - Fill the below array.
 struct command_instructions c_instructions_array[INSTRUCTION_ARRAY_S] = {
+        {.c_name = LIST_OPTIONS, .c_attributes[0] = C_INTERVAL_OP, .c_attributes[1] = CHECK_ID},
         {.c_name = LIST_CHECKS, .c_attributes[0] = CHECK_ID, .c_attributes[1] = CHECK_ID_D}
 };
 
@@ -49,7 +53,6 @@ static inline int get_instructions(const char *c_name) {
     return -1;
 }
 
-
 void list_command(const char *what_to_list) {
     int index_of_instruction = get_instructions(what_to_list);
     if (index_of_instruction == -1) return;
@@ -70,9 +73,15 @@ void list_command(const char *what_to_list) {
     strcpy(tmp, location_of_interest);
 
     char *current_element = strtok(location_of_interest, "\n");
-    int row = 0;
+    int row = 1;
+
+    int skip_first = FALSE;
+    if (!strcmp(instructions.c_name, LIST_CHECKS) || !strcmp(instructions.c_name, LIST_TARGETS))
+        skip_first = TRUE;
 
     while (current_element != NULL && strcmp(current_element, instructions.c_attributes[1]) != 0) {
+        if (row == 1 && skip_first) current_element = strtok(NULL, "\n");
+
         printf("%d: %s\n", row, current_element);
         row++;
         current_element = strtok(NULL, "\n");

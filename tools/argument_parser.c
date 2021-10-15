@@ -13,9 +13,9 @@ typedef void func_arg_2(const char *, const char *);
 
 // each row represent one command.
 // each column represent one property of this specific command.
-const struct command_p commands[NUMBER_OF_COMMANDS] = {
+/*const struct command_p commands[NUMBER_OF_COMMANDS] = {
         // TODO - Fill the array here.
-};
+};*/
 
 
 /**
