@@ -1,3 +1,4 @@
+/* argument_parser.c */
 #include <string.h>
 
 #include <parsing/argument_parser.h>
@@ -30,27 +31,19 @@
 #define D_PATH_OP               "default_dir_path"
 #define D_ENABL_OP              "enable_default_path"
 
-/* number of args  */
-#define ARGS_0                  0
-#define ARGS_1                  1
-#define ARGS_2                  2
-
-/* helper bytes */
-#define IS_ADD                  1
-#define IS_INTEGER              1
-#define IS_NOT_ADD              0
-#define IS_NOT_INTEGER          0
-
+/* functions types */
+typedef void func_arg_1(const char *);
+typedef void func_arg_2(const char *, const char *);
 
 /* number of the commands. */
 #define NUMBER_OF_COMMANDS 12
 
-// TODO - Make a few types.
+struct command_p
 
 // each row represent one command.
 // each column represent one property of this specific command.
 const struct command_p commands[NUMBER_OF_COMMANDS] = {
-
+        // TODO - Fill the array here.
 };
 
 
@@ -64,7 +57,6 @@ static inline int find_command(const char *name) {
 }
 
 void parse_args(int argc, char **argv) {
-
-
+    
 }
 
