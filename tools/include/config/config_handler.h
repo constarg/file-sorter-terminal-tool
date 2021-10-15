@@ -15,6 +15,6 @@ extern int write_config(char *changes, size_t changes_len);
  * @param config_content The variable that will get the content.
  * @return -1 on error or 0 on success.
  */
-extern int read_config(char **config_content);
+extern char *read_config();
 
 #endif
