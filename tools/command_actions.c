@@ -101,27 +101,52 @@ void list_command(const char *what_to_list) {
 }
 
 static int is_integer(const char *value) {
-    char digits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+    char *digits = "0123456789";
     int found = FALSE;
+    char *digits_first_address = &digits[0];
 
-    int index = 0;
-    while ( digits[index++] != '\0' ) {
-        while ( *(value++) != '\0' )
-            if (digits[index] == *value) {
+    while (*value) {
+        digits = digits_first_address;
+        found = FALSE;
+        while (*digits) {
+            if (*value == *digits)
                 found = TRUE;
-                break;
-            }
+            digits++;
+        }
         if (!found) return FALSE;
+        value++;
     }
 
     return TRUE;
 }
 
 static char **config_to_array(const char *config, size_t *size) {
-    return NULL;
+    // Here we are going to store all the content of the config as an array.
+    char **config_array;
+    ALLOCATE_MEMORY(config_array, 1, sizeof(char *));
+
+    // Copy the config file into the tmp, to not break the original config.
+    char tmp[strlen(config) + 1];
+    strcpy(tmp, config);
+
+    char *current_element = strtok(tmp, "\n");
+
+    size_t config_array_s = 0;
+    // Get each element on the config.
+    while (current_element != NULL) {
+        ALLOCATE_MEMORY(config_array[config_array_s], strlen(current_element) + 1, sizeof(char));
+        strcpy(config_array[config_array_s], current_element);
+
+        ++config_array_s;
+        REALLOCATE_MEMORY(config_array, config_array_s + 1, sizeof(char *));
+        current_element = strtok(NULL, "\n");
+    }
+    *size = config_array_s;
+    return config_array;
 }
 
-static char *array_to_config(const char **array) {
+static char *array_to_config(const char **array, size_t array_s) {
+    // TODO - Make this function.
     return NULL;
 }
 
@@ -143,22 +168,24 @@ void set_value(const char *option, const char *new_value) {
     char **config_array = config_to_array(config, &config_array_s);
 
     int index_of_interest = 0;
-    for (int curr_option = 0; curr_option < config_array_s; curr_option) {
-        if (!strcmp(config_array[curr_option], option)) index_of_interest = curr_option;
+    for (int curr_option = 0; curr_option < config_array_s; curr_option++) {
+        if (strstr(config_array[curr_option], instructions.c_attributes[0])) index_of_interest = curr_option;
     }
+    if (index_of_interest == 0) return;
 
     // Form the changed option.
     char *changed_option;
-    ALLOCATE_MEMORY(changed_option, strlen(option) + strlen(new_value) + 3, sizeof(char));
-    strcpy(changed_option, option);
-    strcat(changed_option, ": ");
+    ALLOCATE_MEMORY(changed_option, strlen(instructions.c_attributes[0]) + strlen(new_value) + 2, sizeof(char));
+    strcpy(changed_option, instructions.c_attributes[0]);
+    strcat(changed_option, " ");
     strcat(changed_option, new_value);
 
     // Set the changed option in the right place.
     config_array[index_of_interest] = changed_option;
+
     // Rebuild the config file.
     free(config);
-    config = array_to_config((const char **) config_array);
+    config = array_to_config((const char **) config_array, config_array_s);
     // TODO - Write the result back the the config.conf
 
     FREE_ARRAY(config_array, config_array_s);

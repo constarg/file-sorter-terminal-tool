@@ -12,7 +12,7 @@
     } while(0)
 
 #define REALLOCATE_MEMORY(VAR, NEW_SIZE, SIZEOF_TYPE) do {          \
-        VAR = realloc(VAR, NEW_SIZE * SIZEOF_TYPE);                 \
+        VAR = realloc(VAR, (NEW_SIZE) * SIZEOF_TYPE);               \
         if (VAR == NULL) exit(OUT_OF_MEMORY_ERROR);                 \
     } while(0)
 
