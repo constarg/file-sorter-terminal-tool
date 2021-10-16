@@ -19,19 +19,19 @@ struct a_command {
 };
 
 static struct a_command commands[NUMBER_OF_COMMANDS] = {
-        {.c_name = SET_CHECK_INTERVAL,    .c_func = (generic *) &set_value,     .c_argc = 1},
-        {.c_name = SET_PARSE_INTERVAL,    .c_func = (generic *) &set_value,     .c_argc = 1},
-        {.c_name = SET_DEBUG_LOG,         .c_func = (generic *) &set_value,     .c_argc = 1},
-        {.c_name = SET_DEFAULT_DIR_PATH,  .c_func = (generic *) &set_value,     .c_argc = 1},
-        {.c_name = SET_ENABLE_DEF_DIR,    .c_func = (generic *) &set_value,     .c_argc = 1},
-        {.c_name = ADD_CHECK,             .c_func = (generic *) &add_check,     .c_argc = 1},
-        {.c_name = ADD_TARGET,            .c_func = (generic *) &add_target,    .c_argc = 2},
-        {.c_name = REMOVE_CHECK,          .c_func = (generic *) &remove_check,  .c_argc = 1},
-        {.c_name = REMOVE_TARGET,         .c_func = (generic *) &remove_target, .c_argc = 2},
-        {.c_name = LIST_CHECKS,           .c_func = (generic *) &list_checks,   .c_argc = 0},
-        {.c_name = LIST_TARGETS,          .c_func = (generic *) &list_targets,  .c_argc = 0},
-        {.c_name = LIST_OPTIONS,          .c_func = (generic *) &list_options,  .c_argc = 0},
-        {.c_name = HELP,                  .c_func = (generic *) &help,          .c_argc = 0}
+        {.c_name = SET_CHECK_INTERVAL,    .c_func = (generic *) &set_check_interval,     .c_argc = 1},
+        {.c_name = SET_PARSE_INTERVAL,    .c_func = (generic *) &set_parse_interval,     .c_argc = 1},
+        {.c_name = SET_DEBUG_LOG,         .c_func = (generic *) &set_debug_log,          .c_argc = 1},
+        {.c_name = SET_DEFAULT_DIR_PATH,  .c_func = (generic *) &set_enable_def_dir,     .c_argc = 1},
+        {.c_name = SET_ENABLE_DEF_DIR,    .c_func = (generic *) &set_enable_def_dir,     .c_argc = 1},
+        {.c_name = ADD_CHECK,             .c_func = (generic *) &add_check,              .c_argc = 1},
+        {.c_name = ADD_TARGET,            .c_func = (generic *) &add_target,             .c_argc = 2},
+        {.c_name = REMOVE_CHECK,          .c_func = (generic *) &remove_check,           .c_argc = 1},
+        {.c_name = REMOVE_TARGET,         .c_func = (generic *) &remove_target,          .c_argc = 2},
+        {.c_name = LIST_CHECKS,           .c_func = (generic *) &list_checks,            .c_argc = 0},
+        {.c_name = LIST_TARGETS,          .c_func = (generic *) &list_targets,           .c_argc = 0},
+        {.c_name = LIST_OPTIONS,          .c_func = (generic *) &list_options,           .c_argc = 0},
+        {.c_name = HELP,                  .c_func = (generic *) &help,                   .c_argc = 0}
 };
 
 static inline int find_command(const char *c_name) {

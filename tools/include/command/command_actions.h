@@ -48,6 +48,40 @@ extern void remove_check(int row_line);
  */
 extern void list_command(const char *what_to_list);
 
+/**
+ * Change the value of check interval.
+ */
+static inline void set_check_interval(const char *new_value) {
+    set_value(SET_CHECK_INTERVAL, new_value);
+}
+
+/**
+ * Change the value of parse interval.
+ */
+static inline void set_parse_interval(const char *new_value) {
+    set_value(SET_PARSE_INTERVAL, new_value);
+}
+
+/**
+ * Change the value of debug.
+ */
+static inline void set_debug_log(const char *new_value) {
+    set_value(SET_DEBUG_LOG, new_value);
+}
+
+/**
+ * Change the location of the default dir path.
+ */
+static inline void set_default_dir_path(const char *new_value) {
+    set_value(SET_DEFAULT_DIR_PATH, new_value);
+}
+
+/**
+ * Enable default dir path.
+ */
+static inline void set_enable_def_dir(const char *new_value) {
+    set_value(SET_ENABLE_DEF_DIR, new_value);
+}
 
 /**
  * List checks.
