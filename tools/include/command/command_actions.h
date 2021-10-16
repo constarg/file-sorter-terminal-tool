@@ -48,4 +48,20 @@ extern void remove_check(int row_line);
  */
 extern void list_command(const char *what_to_list);
 
+
+/**
+ * List checks.
+ */
+static inline void list_checks() { list_command(LIST_CHECKS); }
+
+/**
+ * List targets.
+ */
+static inline void list_targets() { list_command(LIST_TARGETS); }
+
+/**
+ * List options.
+ */
+static inline void list_options() { list_command(LIST_OPTIONS); }
+
 #endif

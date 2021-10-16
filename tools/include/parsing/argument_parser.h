@@ -15,6 +15,7 @@
 #define LIST_CHECKS             "--list-checks"
 #define LIST_TARGETS            "--list-targets"
 #define LIST_OPTIONS            "--list-options"
+#define HELP                    "--help"
 
 /* identifier */
 #define CHECK_ID                "[check]"

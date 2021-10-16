@@ -1,7 +1,7 @@
 /* command_action.c */
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <command/command_actions.h>
 #include <config/config_handler.h>
@@ -21,6 +21,7 @@ struct command_instructions {
 // TODO - Fill the below array.
 struct command_instructions c_instructions_array[INSTRUCTION_ARRAY_S] = {
         {.c_name = LIST_OPTIONS, .c_attributes[0] = C_INTERVAL_OP, .c_attributes[1] = CHECK_ID},
+        {.c_name = LIST_TARGETS, .c_attributes[0] = TARGET_ID, .c_attributes[1] = TARGET_ID_D},
         {.c_name = LIST_CHECKS, .c_attributes[0] = CHECK_ID, .c_attributes[1] = CHECK_ID_D}
 };
 
@@ -89,6 +90,7 @@ void list_command(const char *what_to_list) {
 
     free(config);
 }
+
 
 void set_value(const char *option, const char *new_value) {
     // TODO - Set new value to the option @option.
