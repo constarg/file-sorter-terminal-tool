@@ -105,6 +105,7 @@ static int is_integer(const char *value) {
     int found = FALSE;
     char *digits_first_address = &digits[0];
 
+    // TODO - Make the below method using the binary search algorithm, to decrease the complexity.
     while (*value) {
         digits = digits_first_address;
         found = FALSE;
@@ -181,6 +182,7 @@ void set_value(const char *option, const char *new_value) {
     strcat(changed_option, new_value);
 
     // Set the changed option in the right place.
+    free(config_array[index_of_interest]);
     config_array[index_of_interest] = changed_option;
 
     // Rebuild the config file.
