@@ -16,13 +16,22 @@
 struct command_instructions {
     char  *c_name;          // command name.
     char  *c_attributes[2]; // command attributes.
+    int    c_is_int;
 };
 
-// TODO - Fill the below array.
 struct command_instructions c_instructions_array[INSTRUCTION_ARRAY_S] = {
-        {.c_name = LIST_OPTIONS, .c_attributes[0] = C_INTERVAL_OP, .c_attributes[1] = CHECK_ID},
-        {.c_name = LIST_TARGETS, .c_attributes[0] = TARGET_ID, .c_attributes[1] = TARGET_ID_D},
-        {.c_name = LIST_CHECKS, .c_attributes[0] = CHECK_ID, .c_attributes[1] = CHECK_ID_D}
+        {.c_name = SET_CHECK_INTERVAL,   .c_attributes[0] = C_INTERVAL_OP,  .c_attributes[1] = NULL,        .c_is_int = TRUE},
+        {.c_name = SET_PARSE_INTERVAL,   .c_attributes[0] = P_INTERVAL_OP,  .c_attributes[1] = NULL,        .c_is_int = TRUE},
+        {.c_name = SET_DEBUG_LOG,        .c_attributes[0] = D_ENABL_OP,     .c_attributes[1] = NULL,        .c_is_int = TRUE},
+        {.c_name = SET_DEFAULT_DIR_PATH, .c_attributes[0] = D_PATH_OP,      .c_attributes[1] = NULL,        .c_is_int = FALSE},
+        {.c_name = SET_ENABLE_DEF_DIR,   .c_attributes[0] = D_ENABL_OP,     .c_attributes[1] = NULL,        .c_is_int = TRUE},
+        {.c_name = ADD_CHECK,            .c_attributes[0] = CHECK_ID,       .c_attributes[1] = CHECK_ID_D,  .c_is_int = FALSE},
+        {.c_name = ADD_TARGET,           .c_attributes[0] = TARGET_ID,      .c_attributes[1] = TARGET_ID_D, .c_is_int = FALSE},
+        {.c_name = REMOVE_CHECK,         .c_attributes[0] = CHECK_ID,       .c_attributes[1] = CHECK_ID_D,  .c_is_int = FALSE},
+        {.c_name = REMOVE_TARGET,        .c_attributes[0] = TARGET_ID,      .c_attributes[1] = TARGET_ID_D, .c_is_int = FALSE},
+        {.c_name = LIST_OPTIONS,         .c_attributes[0] = C_INTERVAL_OP,  .c_attributes[1] = CHECK_ID,    .c_is_int = FALSE},
+        {.c_name = LIST_TARGETS,         .c_attributes[0] = TARGET_ID,      .c_attributes[1] = TARGET_ID_D, .c_is_int = FALSE},
+        {.c_name = LIST_CHECKS,          .c_attributes[0] = CHECK_ID,       .c_attributes[1] = CHECK_ID_D,  .c_is_int = FALSE}
 };
 
 
@@ -91,9 +100,43 @@ void list_command(const char *what_to_list) {
     free(config);
 }
 
+static int is_integer(const char *value) {
+    char digits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+    int found = FALSE;
+
+    int index = 0;
+    while ( digits[index] != '\0' ) {
+        while ( *(value++) != '\0' )
+            if (digits[index] == *value) {
+                found = TRUE;
+                break;
+            }
+        if (!found) return FALSE;
+    }
+
+    return TRUE;
+}
 
 void set_value(const char *option, const char *new_value) {
-    // TODO - Set new value to the option @option.
+    int index_of_instructions = get_instructions(option);
+    if (index_of_instructions == -1) return;
+
+    struct command_instructions instructions = c_instructions_array[index_of_instructions];
+    // Check if we want the new_value to be integer.
+    if (instructions.c_is_int) {
+        if (!is_integer(new_value)) return;
+    }
+
+    char *config = read_config();
+    if (config == NULL) return;
+
+    // Here we replace the old value with the new.
+    // TODO - Make an array in which i will put each option in a different index.
+    // TODO - Build the option with the new value.
+    // TODO - Rebuild the config file.
+    // TODO - Write the result back the the config.conf
+
+    free(config);
 }
 
 void add_target(const char *new_target) {
