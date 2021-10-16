@@ -105,7 +105,7 @@ static int is_integer(const char *value) {
     int found = FALSE;
 
     int index = 0;
-    while ( digits[index] != '\0' ) {
+    while ( digits[index++] != '\0' ) {
         while ( *(value++) != '\0' )
             if (digits[index] == *value) {
                 found = TRUE;
@@ -115,6 +115,14 @@ static int is_integer(const char *value) {
     }
 
     return TRUE;
+}
+
+static char **config_to_array(const char *config, size_t *size) {
+    return NULL;
+}
+
+static char *array_to_config(const char **array) {
+    return NULL;
 }
 
 void set_value(const char *option, const char *new_value) {
@@ -131,11 +139,30 @@ void set_value(const char *option, const char *new_value) {
     if (config == NULL) return;
 
     // Here we replace the old value with the new.
-    // TODO - Make an array in which i will put each option in a different index.
-    // TODO - Build the option with the new value.
-    // TODO - Rebuild the config file.
+    size_t config_array_s = 0;
+    char **config_array = config_to_array(config, &config_array_s);
+
+    int index_of_interest = 0;
+    for (int curr_option = 0; curr_option < config_array_s; curr_option) {
+        if (!strcmp(config_array[curr_option], option)) index_of_interest = curr_option;
+    }
+
+    // Form the changed option.
+    char *changed_option;
+    ALLOCATE_MEMORY(changed_option, strlen(option) + strlen(new_value) + 3, sizeof(char));
+    strcpy(changed_option, option);
+    strcat(changed_option, ": ");
+    strcat(changed_option, new_value);
+
+    // Set the changed option in the right place.
+    config_array[index_of_interest] = changed_option;
+    // Rebuild the config file.
+    free(config);
+    config = array_to_config((const char **) config_array);
     // TODO - Write the result back the the config.conf
 
+    FREE_ARRAY(config_array, config_array_s);
+    free(changed_option);
     free(config);
 }
 
