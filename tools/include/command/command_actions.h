@@ -28,7 +28,7 @@ extern void add_target(const char *new_target);
  * of targets.
  * @param new_check The new check to be appended.
  */
-extern void add_new_check(const char *new_check);
+extern void add_check(const char *new_check);
 
 /**
  * Remove the target in a specific row line.
