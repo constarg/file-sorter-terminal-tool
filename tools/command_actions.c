@@ -100,7 +100,7 @@ void add_target(const char *new_target) {
     // TODO - add the target @new_target in the targets.
 }
 
-void add_new_check(const char *new_check) {
+void add_check(const char *new_check) {
     // TODO - add the check @new_check in the checks.
 }
 
