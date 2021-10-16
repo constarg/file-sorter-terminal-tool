@@ -16,4 +16,10 @@
         if (VAR == NULL) exit(OUT_OF_MEMORY_ERROR);                 \
     } while(0)
 
+#define FREE_ARRAY(ARRAY, SIZE) do {                                \
+        for (int index = 0; index < SIZE; index++)                  \
+            free(ARRAY[index]);                                     \
+        free(ARRAY);                                                \
+    } while(0)
+
 #endif
