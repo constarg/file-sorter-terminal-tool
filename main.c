@@ -2,7 +2,7 @@
 #include <command/command_actions.h>
 
 int main(int argc, char **argv) {
-    //parse_args(argc, argv);
+    parse_args(argc, argv);
 
     return 0;
 }
