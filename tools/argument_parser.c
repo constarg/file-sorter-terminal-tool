@@ -22,7 +22,7 @@ static struct a_command commands[NUMBER_OF_COMMANDS] = {
         {.c_name = SET_CHECK_INTERVAL,    .c_func = (generic *) &set_check_interval,     .c_argc = 1},
         {.c_name = SET_PARSE_INTERVAL,    .c_func = (generic *) &set_parse_interval,     .c_argc = 1},
         {.c_name = SET_DEBUG_LOG,         .c_func = (generic *) &set_debug_log,          .c_argc = 1},
-        {.c_name = SET_DEFAULT_DIR_PATH,  .c_func = (generic *) &set_enable_def_dir,     .c_argc = 1},
+        {.c_name = SET_DEFAULT_DIR_PATH,  .c_func = (generic *) &set_default_dir_path,   .c_argc = 1},
         {.c_name = SET_ENABLE_DEF_DIR,    .c_func = (generic *) &set_enable_def_dir,     .c_argc = 1},
         {.c_name = ADD_CHECK,             .c_func = (generic *) &add_check,              .c_argc = 1},
         {.c_name = ADD_TARGET,            .c_func = (generic *) &add_target,             .c_argc = 2},

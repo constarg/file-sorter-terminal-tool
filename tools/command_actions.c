@@ -195,18 +195,10 @@ void set_value(const char *option, const char *new_value) {
     free(config);
 }
 
-void add_target(const char *new_target) {
-    // TODO - add the target @new_target in the targets.
+void add_to_list(const char *option, const char *value_to_add) {
+    // TODO - Make this function.
 }
 
-void add_check(const char *new_check) {
-    // TODO - add the check @new_check in the checks.
-}
-
-void remove_target(int row_line) {
-    // TODO - remove target in line @row_line.
-}
-
-void remove_check(int row_line) {
-    // TODO - remove check in line @row_line.
+void remove_from_list(const char *option, const char *row_number) {
+    // TODO - Make this function.
 }
