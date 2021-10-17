@@ -17,30 +17,18 @@ extern void help();
 extern void set_value(const char *option, const char *new_value);
 
 /**
- * Append a new target to the config file, in the section
- * of targets.
- * @param new_target The new target to be appended.
+ * Adds a new element on a specific list.
+ * @param option The option that contains the list.
+ * @param value_to_add The element to be added.
  */
-extern void add_target(const char *new_target);
+extern void add_to_list(const char *option, const char *value_to_add);
 
 /**
- * Append a new check to the config file, in the section
- * of targets.
- * @param new_check The new check to be appended.
+ * Removes an element from a specific list.
+ * @param option The option that contains the list.
+ * @param row_number The the position of the element to be deleted.
  */
-extern void add_check(const char *new_check);
-
-/**
- * Remove the target in a specific row line.
- * @param row_line The row line of the target to be removed.
- */
-extern void remove_target(int row_line);
-
-/**
- * Remove the check in a specific row line.
- * @param row_line The row line of the check to be removed.
- */
-extern void remove_check(int row_line);
+extern void remove_from_list(const char *option, const char *row_number);
 
 /**
  * List the contents of a specific element.
@@ -81,6 +69,46 @@ static inline void set_default_dir_path(const char *new_value) {
  */
 static inline void set_enable_def_dir(const char *new_value) {
     set_value(SET_ENABLE_DEF_DIR, new_value);
+}
+
+/**
+ * Append a new check to the config file, in the section
+ * of targets.
+ * @param new_check The new check to be appended.
+ */
+static inline void add_check(const char *new_check) {
+    add_to_list(ADD_CHECK, new_check);
+}
+
+/**
+ * Append a new target to the config file, in the section
+ * of targets.
+ * @param target_path The path to be appended.
+ * @param target_ext  The file to be related with the target_path.
+ */
+static inline void add_target(const char *target_path, const char *target_ext) {
+    char target[strlen(target_path) + strlen(target_ext) + 2];
+    strcpy(target, target_path);
+    strcat(target, " ");
+    strcat(target, target_ext);
+
+    add_to_list(ADD_TARGET, target);
+}
+
+/**
+ * Remove the target in a specific row line.
+ * @param row_line The row line of the target to be removed.
+ */
+static inline void remove_target(const char *row_line) {
+    remove_from_list(REMOVE_TARGET, row_line);
+}
+
+/**
+ * Remove the check in a specific row line.
+ * @param row_line The row line of the check to be removed.
+ */
+static inline void remove_check(const char *row_line) {
+    remove_from_list(REMOVE_CHECK, row_line);
 }
 
 /**
