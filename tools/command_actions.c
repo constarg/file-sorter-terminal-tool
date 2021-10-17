@@ -1,7 +1,6 @@
 /* command_action.c */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include <command/command_actions.h>
 #include <config/config_handler.h>
@@ -22,7 +21,7 @@ struct command_instructions {
 struct command_instructions c_instructions_array[INSTRUCTION_ARRAY_S] = {
         {.c_name = SET_CHECK_INTERVAL,   .c_attributes[0] = C_INTERVAL_OP,  .c_attributes[1] = NULL,        .c_is_int = TRUE},
         {.c_name = SET_PARSE_INTERVAL,   .c_attributes[0] = P_INTERVAL_OP,  .c_attributes[1] = NULL,        .c_is_int = TRUE},
-        {.c_name = SET_DEBUG_LOG,        .c_attributes[0] = D_ENABL_OP,     .c_attributes[1] = NULL,        .c_is_int = TRUE},
+        {.c_name = SET_DEBUG_LOG,        .c_attributes[0] = D_LOG_OP,       .c_attributes[1] = NULL,        .c_is_int = TRUE},
         {.c_name = SET_DEFAULT_DIR_PATH, .c_attributes[0] = D_PATH_OP,      .c_attributes[1] = NULL,        .c_is_int = FALSE},
         {.c_name = SET_ENABLE_DEF_DIR,   .c_attributes[0] = D_ENABL_OP,     .c_attributes[1] = NULL,        .c_is_int = TRUE},
         {.c_name = ADD_CHECK,            .c_attributes[0] = CHECK_ID,       .c_attributes[1] = CHECK_ID_D,  .c_is_int = FALSE},
@@ -147,8 +146,25 @@ static char **config_to_array(const char *config, size_t *size) {
 }
 
 static char *array_to_config(const char **array, size_t array_s) {
-    // TODO - Make this function.
-    return NULL;
+    size_t config_s = strlen(array[0]);
+    char *config;
+    ALLOCATE_MEMORY(config, config_s + 1, sizeof(char));
+    strcpy(config, array[0]);
+
+
+    for (int curr_element = 1; curr_element < array_s; curr_element++) {
+        config_s += strlen(array[curr_element]) + 2;
+        REALLOCATE_MEMORY(config, config_s + 1, sizeof(char));
+        strcat(config, "\n");
+        if (!strcmp(array[curr_element], CHECK_ID) || !strcmp(array[curr_element], TARGET_ID)) {
+            REALLOCATE_MEMORY(config, ++config_s + 1, sizeof(char));
+            strcat(config, "\n");
+        }
+
+        strcat(config, array[curr_element]);
+    }
+
+    return config;
 }
 
 void set_value(const char *option, const char *new_value) {
@@ -188,10 +204,9 @@ void set_value(const char *option, const char *new_value) {
     // Rebuild the config file.
     free(config);
     config = array_to_config((const char **) config_array, config_array_s);
-    // TODO - Write the result back the the config.conf
+    if (write_config(config, strlen(config)) == -1) return;
 
     FREE_ARRAY(config_array, config_array_s);
-    free(changed_option);
     free(config);
 }
 
