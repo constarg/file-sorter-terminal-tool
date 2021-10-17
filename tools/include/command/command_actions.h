@@ -6,6 +6,11 @@
 #include <string.h>
 
 /**
+ * Display unrecognized message.
+ */
+void unrecognized_option();
+
+/**
  * Display a help message for the user.
  */
 extern void help();

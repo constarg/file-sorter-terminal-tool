@@ -45,12 +45,12 @@ static inline int find_command(const char *c_name) {
 }
 
 void parse_args(int argc, char **argv) {
-    if (argc < 2) help();
+    if (argc < 2) unrecognized_option();
 
     int command_to_exec = find_command(argv[1]);
-    if (command_to_exec == -1) help();
+    if (command_to_exec == -1) unrecognized_option();
 
-    if ((argc - 2) < commands[command_to_exec].c_argc) help();
+    if ((argc - 2) < commands[command_to_exec].c_argc) unrecognized_option();
 
     if (commands[command_to_exec].c_argc == 0) commands[command_to_exec].c_func();
     else if (commands[command_to_exec].c_argc == 1) ((func_arg_1 *) commands[command_to_exec].c_func)(argv[2]);

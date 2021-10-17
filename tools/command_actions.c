@@ -33,6 +33,13 @@ struct command_instructions c_instructions_array[INSTRUCTION_ARRAY_S] = {
         {.c_name = LIST_CHECKS,          .c_attributes[0] = CHECK_ID,       .c_attributes[1] = CHECK_ID_D,  .c_is_int = FALSE}
 };
 
+void unrecognized_option() {
+
+    printf("sorter: unrecognized option...\n"
+                  "Try 'sorter --help' for more information.\n");
+
+    exit(0);
+}
 
 void help() {
 
@@ -211,6 +218,8 @@ void set_value(const char *option, const char *new_value) {
 }
 
 void add_to_list(const char *option, const char *value_to_add) {
+
+
     // TODO - Make this function.
 }
 
