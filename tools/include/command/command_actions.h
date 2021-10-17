@@ -3,6 +3,7 @@
 #define FILE_SORTER_TERMINAL_TOOL_COMMAND_ACTIONS_H
 
 #include <parsing/argument_parser.h>
+#include <string.h>
 
 /**
  * Display a help message for the user.
@@ -84,7 +85,7 @@ static inline void add_check(const char *new_check) {
  * Append a new target to the config file, in the section
  * of targets.
  * @param target_path The path to be appended.
- * @param target_ext  The file to be related with the target_path.
+ * @param target_ext  The file extension to be related with the target_path.
  */
 static inline void add_target(const char *target_path, const char *target_ext) {
     char target[strlen(target_path) + strlen(target_ext) + 2];
