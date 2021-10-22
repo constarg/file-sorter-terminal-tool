@@ -33,30 +33,30 @@ struct command_instructions c_instructions_array[INSTRUCTION_ARRAY_S] = {
         {.c_name = LIST_CHECKS,          .c_attributes[0] = CHECK_ID,       .c_attributes[1] = CHECK_ID_D,  .c_is_int = FALSE}
 };
 
+const char usage[] = "Usage:\n \tsorter [OPTION] ...\n\n"
+                     "\t--set-check-interval      [value] Change the value of check interval.\n"
+                     "\t--set-parse-interval      [value] Change the value of parse interval.\n"
+                     "\t--set-default-dir-path    [path] Change the default directory path.\n"
+                     "\t--set-enable-default-dir  [value] 0:1 Enable the to transfer files in default dir.\n"
+                     "\t--set-debug-log           [value] 0:1 Change the log to debug mode (1).\n"
+                     "\t--add-check               [path] Add new check.\n"
+                     "\t--add-target              [ext] [path] Add new target.\n"
+                     "\t--remove-check            [row number] remove check.\n"
+                     "\t--remove-target           [row number] remove target.\n"
+                     "\t--list-checks list checks.\n"
+                     "\t--list-targets list targets.\n"
+                     "\t--list-options list options.\n";
+
+const char unrecognized[] = "sorter: unrecognized option...\n"
+                            "Try 'sorter --help' for more information.\n";
+
 void unrecognized_option() {
-
-    printf("sorter: unrecognized option...\n"
-                  "Try 'sorter --help' for more information.\n");
-
+    printf(unrecognized);
     exit(0);
 }
 
 void help() {
-
-    printf("Usage:\n \tsorter [OPTION] ...\n\n"
-           "\t--set-check-interval      [value] Change the value of check interval.\n"
-           "\t--set-parse-interval      [value] Change the value of parse interval.\n"
-           "\t--set-default-dir-path    [path] Change the default directory path.\n"
-           "\t--set-enable-default-dir  [value] 0:1 Enable the to transfer files in default dir.\n"
-           "\t--set-debug-log           [value] 0:1 Change the log to debug mode (1).\n"
-           "\t--add-check               [path] Add new check.\n"
-           "\t--add-target              [ext] [path] Add new target.\n"
-           "\t--remove-check            [row number] remove check.\n"
-           "\t--remove-target           [row number] remove target.\n"
-           "\t--list-checks list checks.\n"
-           "\t--list-targets list targets.\n"
-           "\t--list-options list options.\n");
-
+    printf(usage);
     exit(0);
 }
 
@@ -217,12 +217,36 @@ void set_value(const char *option, const char *new_value) {
     free(config);
 }
 
-void add_to_list(const char *option, const char *value_to_add) {
+/**
+ * Left shift the array from a specific index and left.
+ * @param array The array to be shift.
+ * @param array_s The size of the array.
+ * @param point The index from where we want to shift.
+ */
+static inline void left_shift_array(char **array, size_t *array_s, int point) {
+    if (point > *array_s) return;
 
+    const int how_much_to_shift = 1; // No need for more.
+    // Allocate the space for the extended array.
+    REALLOCATE_MEMORY(array, (*array_s) + 1, sizeof(char *));
+    ALLOCATE_MEMORY(array[*array_s], strlen(array[(*array_s) - 1]), sizeof(char)); // Initialize the extra space.
+    ++(*array_s);
 
+    // Shift left.
+    for (size_t curr_element = (*array_s - 2); curr_element > point; curr_element--)
+        array[curr_element + 1] = array[curr_element];
+}
+
+void add_to_list(const char *where_to_add, const char *value_to_add) {
+    int index_of_instruction = get_instructions(where_to_add);
+    if (index_of_instruction == -1) return;
+
+    struct command_instructions instructions = c_instructions_array[index_of_instruction];
+
+    // TODO - Use the shift array function to make an empty space in the desire location.
     // TODO - Make this function.
 }
 
-void remove_from_list(const char *option, const char *row_number) {
+void remove_from_list(const char *from_where, const char *row_number) {
     // TODO - Make this function.
 }
