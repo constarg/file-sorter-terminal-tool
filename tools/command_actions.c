@@ -1,404 +1,328 @@
+/* command_action.c */
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 
 #include <command/command_actions.h>
 #include <config/config_handler.h>
 #include <parsing/argument_parser.h>
+#include <mem/mem.h>
 
-#define OPTION_NUMBER           6
-#define SPLITTER                "\n"
-#define CHANGE_LINE             "\n"
+#define TRUE  1
+#define FALSE 0
 
-#define TARGET_IDENTIFIER       "[targets]"
-#define CHECK_IDENTIFIER        "[check]"
-#define CHECK_DONE_IDENTIFIER   "[done_check]"
+#define INSTRUCTION_ARRAY_S 12
 
-#define OPTIONS_START           "check_interval"
+struct command_instructions {
+    char  *c_name;          // command name.
+    char  *c_attributes[2]; // command attributes.
+    int    c_is_int;
+};
 
-void list(char *begin, char *end);
+struct command_instructions c_instructions_array[INSTRUCTION_ARRAY_S] = {
+        {.c_name = SET_CHECK_INTERVAL,   .c_attributes[0] = C_INTERVAL_OP,  .c_attributes[1] = NULL,        .c_is_int = TRUE},
+        {.c_name = SET_PARSE_INTERVAL,   .c_attributes[0] = P_INTERVAL_OP,  .c_attributes[1] = NULL,        .c_is_int = TRUE},
+        {.c_name = SET_DEBUG_LOG,        .c_attributes[0] = D_LOG_OP,       .c_attributes[1] = NULL,        .c_is_int = TRUE},
+        {.c_name = SET_DEFAULT_DIR_PATH, .c_attributes[0] = D_PATH_OP,      .c_attributes[1] = NULL,        .c_is_int = FALSE},
+        {.c_name = SET_ENABLE_DEF_DIR,   .c_attributes[0] = D_ENABL_OP,     .c_attributes[1] = NULL,        .c_is_int = TRUE},
+        {.c_name = ADD_CHECK,            .c_attributes[0] = CHECK_ID,       .c_attributes[1] = CHECK_ID_D,  .c_is_int = FALSE},
+        {.c_name = ADD_TARGET,           .c_attributes[0] = TARGET_ID,      .c_attributes[1] = TARGET_ID_D, .c_is_int = FALSE},
+        {.c_name = REMOVE_CHECK,         .c_attributes[0] = CHECK_ID,       .c_attributes[1] = CHECK_ID_D,  .c_is_int = FALSE},
+        {.c_name = REMOVE_TARGET,        .c_attributes[0] = TARGET_ID,      .c_attributes[1] = TARGET_ID_D, .c_is_int = FALSE},
+        {.c_name = LIST_OPTIONS,         .c_attributes[0] = C_INTERVAL_OP,  .c_attributes[1] = CHECK_ID,    .c_is_int = FALSE},
+        {.c_name = LIST_TARGETS,         .c_attributes[0] = TARGET_ID,      .c_attributes[1] = TARGET_ID_D, .c_is_int = FALSE},
+        {.c_name = LIST_CHECKS,          .c_attributes[0] = CHECK_ID,       .c_attributes[1] = CHECK_ID_D,  .c_is_int = FALSE}
+};
 
-void replace_option(char *option, int option_index, char *new_value, int is_integer);
+const char usage[] = "Usage:\n \tsorter [OPTION] ...\n\n"
+                     "\t--set-check-interval      [value] Change the value of check interval.\n"
+                     "\t--set-parse-interval      [value] Change the value of parse interval.\n"
+                     "\t--set-default-dir-path    [path] Change the default directory path.\n"
+                     "\t--set-enable-default-dir  [value] 0:1 Enable the to transfer files in default dir.\n"
+                     "\t--set-debug-log           [value] 0:1 Change the log to debug mode (1).\n"
+                     "\t--add-check               [path] Add new check.\n"
+                     "\t--add-target              [ext] [path] Add new target.\n"
+                     "\t--remove-check            [row number] remove check.\n"
+                     "\t--remove-target           [row number] remove target.\n"
+                     "\t--list-checks list checks.\n"
+                     "\t--list-targets list targets.\n"
+                     "\t--list-options list options.\n";
 
-void set_option(char *option, char **options, char *new_value, int index, char *missing, size_t prev_conf_size);
+const char unrecognized[] = "sorter: unrecognized option...\n"
+                            "Try 'sorter --help' for more information.\n";
 
-void add_remove(char *location_of_items, char *missing, char *to_add, int items_count, char **options, char *begin, char *end, char *remove);
-
-int is_valid_int_value(char *value, char **result, int return_int_res);
-
-char *convert_array_to_string(char **array, int array_size);
-
-void save(char **options, char **items, char *missing, char *begin, int items_count);
-
-char *get_missing_part(char *config, char *begin, char *end, int item_count);
-
-int count_items(char *items, char *begin, char *end);
-
-void help() {
-
-    printf("Usage:\n \tsorter [OPTION] ...\n\n"
-           "\t--set-check-interval      [value] Change the value of check interval.\n"
-           "\t--set-parse-interval      [value] Change the value of parse interval.\n"
-           "\t--set-default-dir-path    [path] Change the default directory path.\n"
-           "\t--set-enable-default-dir  [value] 0:1 Enable the to transfer files in default dir.\n"
-           "\t--set-debug-log           [value] 0:1 Change the log to debug mode (1).\n"
-           "\t--add-check               [path] Add new check.\n"
-           "\t--add-target              [ext] [path] Add new target.\n"
-           "\t--remove-check            [row number] remove check.\n"
-           "\t--remove-target           [row number] remove target.\n"
-           "\t--list-checks list checks.\n"
-           "\t--list-targets list targets.\n"
-           "\t--list-options list options.\n");
-
+void unrecognized_option() {
+    printf(unrecognized);
     exit(0);
 }
 
-void setter(struct command_p c_command_p, char *new_value) {
-    replace_option(c_command_p.id_one, c_command_p.index, new_value, c_command_p.is_add_or_integer);
+void help() {
+    printf(usage);
+    exit(0);
 }
 
-void list_content(struct command_p c_command_p) {
-    list(c_command_p.id_one, c_command_p.id_two);
+static inline int get_instructions(const char *c_name) {
+    for (int instructions = 0; instructions < INSTRUCTION_ARRAY_S; instructions++) {
+        if (strcmp(c_instructions_array[instructions].c_name, c_name) == 0)
+            return instructions;
+    }
+
+    return -1;
 }
 
-void replace_option(char *option, int option_index, char *new_value, int is_integer) {
-    char *config = NULL;
-    // read the config file.
-    if (read_config(&config) == -1) return;
+void list_command(const char *what_to_list) {
+    int index_of_instruction = get_instructions(what_to_list);
+    if (index_of_instruction == -1) return;
 
-    size_t conf_size = strlen(config);
-    // allocate space to save all the previous options.
-    char **options = calloc(OPTION_NUMBER, sizeof(char *));
-    char *missing = calloc(conf_size + 1, sizeof(char));
+    struct command_instructions instructions = c_instructions_array[index_of_instruction];
+    // Read the config file.
+    char *config = read_config();
+    if (config == NULL) return;
 
-    strncpy(missing, config, conf_size);
-    // save the checks and targets.
-    char *missing_fields = strstr(missing, "[check]");
-    // save the options.
-    options[0] = strtok(config, SPLITTER);
+    char *location_of_interest = strstr(config, instructions.c_attributes[0]);
+    if (!location_of_interest) {
+        free(config);
+        return;
+    }
 
-    for (int index = 1; index < OPTION_NUMBER; index++)
-        options[index] = strtok(NULL, SPLITTER);
+    // Make a copy of the location_of_interest, so we do not break the data of config.
+    char tmp[strlen(location_of_interest + 1)];
+    strcpy(tmp, location_of_interest);
 
-    // check if is an integer.
-    if (is_integer) {
-        char *integer_value;
-        if (is_valid_int_value(new_value, &integer_value, 0))
-            set_option(option, options, new_value, option_index, missing_fields, conf_size);
+    char *current_element = strtok(location_of_interest, "\n");
+    int row = 1;
 
-        free(integer_value);
-    } else set_option(option, options, new_value, option_index, missing_fields, conf_size);
+    int skip_first = FALSE;
+    if (!strcmp(instructions.c_name, LIST_CHECKS) || !strcmp(instructions.c_name, LIST_TARGETS))
+        skip_first = TRUE;
 
-    free(missing);
-    free(options);
+    while (current_element != NULL && strcmp(current_element, instructions.c_attributes[1]) != 0) {
+        if (row == 1 && skip_first) current_element = strtok(NULL, "\n");
+
+        printf("%d: %s\n", row, current_element);
+        row++;
+        current_element = strtok(NULL, "\n");
+    }
+
     free(config);
 }
 
-void add_or_remove(struct command_p c_command_p, char **to_delete_or_add) {
-    char *config = NULL;
+static int is_integer(const char *value) {
+    char *digits = "0123456789";
+    int found = FALSE;
+    char *digits_first_address = &digits[0];
 
-    // get the config.
-    if (read_config(&config) == -1) return;
-
-    // save the options.
-    char *tmp = calloc(strlen(config) + 1, sizeof(char));
-    char *tmp_options;
-    char **options = calloc(OPTION_NUMBER + 1, sizeof(char *));
-    strcpy(tmp, config);
-    tmp_options = strstr(tmp, OPTIONS_START);
-
-    options[0] = "[basic_config]";
-    options[1] = strtok(tmp_options, SPLITTER);
-    for (int option = 2; option < OPTION_NUMBER; option++) options[option] = strtok(NULL, SPLITTER);
-
-    // go to where the items.
-    char *location_of_interest = strstr(config, c_command_p.id_one);
-    int item_count = count_items(location_of_interest, c_command_p.id_one, c_command_p.id_two);
-    char *missing_part = get_missing_part(config, c_command_p.id_one, c_command_p.id_two, item_count);
-
-    if (c_command_p.is_add_or_integer) {
-        if (c_command_p.argc >= 2) {
-            char *to_add = calloc(strlen(to_delete_or_add[2]) + strlen(to_delete_or_add[3]) + 2, sizeof(char));
-            strcat(to_add, to_delete_or_add[2]);
-            strcat(to_add, " ");
-            strcat(to_add, to_delete_or_add[3]);
-            // in case of target.
-            add_remove(location_of_interest, missing_part, to_add, item_count, options, c_command_p.id_one, c_command_p.id_two, NULL);
-
-            free(to_add);
-        } else {
-            add_remove(location_of_interest, missing_part, to_delete_or_add[2], item_count, options, c_command_p.id_one, c_command_p.id_two, NULL);
+    while (*value) {
+        digits = digits_first_address;
+        found = FALSE;
+        while (*digits) {
+            if (*value == *digits)
+                found = TRUE;
+            digits++;
         }
-
-    } else {
-        add_remove(location_of_interest, missing_part, NULL, item_count, options, c_command_p.id_one, c_command_p.id_two, to_delete_or_add[2]);
+        if (!found) return FALSE;
+        value++;
     }
 
-    free(options);
-    free(tmp);
+    return TRUE;
+}
+
+static char **config_to_array(const char *config, size_t *size) {
+    // Here we are going to store all the content of the config as an array.
+    char **config_array;
+    ALLOCATE_MEMORY(config_array, 1, sizeof(char *));
+
+    // Copy the config file into the tmp, to not break the original config.
+    char tmp[strlen(config) + 1];
+    strcpy(tmp, config);
+
+    char *current_element = strtok(tmp, "\n");
+
+    size_t config_array_s = 0;
+    // Get each element on the config.
+    while (current_element != NULL) {
+        ALLOCATE_MEMORY(config_array[config_array_s], strlen(current_element) + 1, sizeof(char));
+        strcpy(config_array[config_array_s], current_element);
+
+        ++config_array_s;
+        REALLOCATE_MEMORY(config_array, config_array_s + 1, sizeof(char *));
+        current_element = strtok(NULL, "\n");
+    }
+    *size = config_array_s;
+    return config_array;
+}
+
+static char **get_config_array(size_t *array_s) {
+    // Read the config.
+    char *config = read_config();
+    if (config == NULL) return NULL;
+
+    // convert config in array.
+    size_t config_array_s = 0;
+    char **config_array = config_to_array(config, &config_array_s);
+    if (config_array_s == 0) return NULL;
+
+    *array_s = config_array_s;
+
     free(config);
+    return config_array;
 }
 
-void add_remove(char *location_of_items,
-         char *missing,
-         char *to_add,
-         int items_count,
-         char **options,
-         char *begin,
-         char *end,
-         char *remove) {
+static char *array_to_config(const char **array, size_t array_s) {
+    size_t config_s = strlen(array[0]);
+    char *config;
+    ALLOCATE_MEMORY(config, config_s + 1, sizeof(char));
+    strcpy(config, array[0]);
 
-    // Allocate enough space for the previous item plus the new.
-    char **items;
 
-    if (remove != NULL) {
-        if (items_count == 0) return;
-        // convert to int.
-        int remove_int = strtol(remove, &remove, 10);
+    for (int curr_element = 1; curr_element < array_s; curr_element++) {
+        if (array[curr_element] == NULL) continue;
 
-        if (remove_int == 0 && remove[0] != '0') return;
-        if (remove_int > items_count) return;
-
-        items = calloc(items_count + 1, sizeof(char *));
-        strtok(location_of_items, SPLITTER);
-
-        for (int item = 0; item < items_count; item++) {
-            if (item + 1 == remove_int) {
-                if (strcmp(strtok(NULL, SPLITTER), end) == 0) return;
-                items[item] = strtok(NULL, SPLITTER);
-                continue;
-            }
-
-            items[item] = strtok(NULL, SPLITTER);
+        config_s += strlen(array[curr_element]) + 2;
+        REALLOCATE_MEMORY(config, config_s + 1, sizeof(char));
+        strcat(config, "\n");
+        if (!strcmp(array[curr_element], CHECK_ID) || !strcmp(array[curr_element], TARGET_ID)) {
+            REALLOCATE_MEMORY(config, ++config_s + 1, sizeof(char));
+            strcat(config, "\n");
         }
-        items[items_count] = end;
-    } else {
-        items = calloc(items_count + 2, sizeof(char *));
-        strtok(location_of_items, SPLITTER);
-        // temporary save the items in array.
-        for (int item = 0; item < items_count; item++) items[item] = strtok(NULL, SPLITTER);
-        items[items_count] = to_add;
-        items[items_count + 1] = end;
-        items_count += 2;
+
+        strcat(config, array[curr_element]);
     }
 
-    // save the changes.
-    save(options, items, missing, begin, items_count);
+    return config;
 }
 
-void save(char **options,
-          char **items,
-          char *missing,
-          char *begin,
-          int items_count) {
+void set_value(const char *option, const char *new_value) {
+    int index_of_instructions = get_instructions(option);
+    if (index_of_instructions == -1) return;
 
-    // get the required strings.
-    char *options_string_form = convert_array_to_string(options, OPTION_NUMBER);
-    char *items_string_form = convert_array_to_string(items, items_count);
-
-    if (options_string_form == NULL || items_string_form == NULL) return;
-
-    // calculate the size of the new config.
-    size_t new_config_size = strlen(options_string_form) + strlen(items_string_form) + strlen(missing) + strlen(begin);
-    // allocate the space for the new config.
-    char *new_config = calloc(new_config_size + 7, sizeof(char));
-
-    // build the config.
-    // set options.
-    strcat(new_config, options_string_form);
-    strcat(new_config, CHANGE_LINE);
-
-    if (strcmp(begin, TARGET_IDENTIFIER) == 0) {
-        strcat(new_config, missing);
-        strcat(new_config, CHANGE_LINE);
-        strcat(new_config, CHANGE_LINE);
-        strcat(new_config, begin);
-        strcat(new_config, CHANGE_LINE);
-        strcat(new_config, items_string_form);
-    } else {
-        strcat(new_config, begin);
-        strcat(new_config, CHANGE_LINE);
-        strcat(new_config, items_string_form);
-        strcat(new_config, CHANGE_LINE);
-        strcat(new_config, CHANGE_LINE);
-        strcat(new_config, missing);
+    struct command_instructions instructions = c_instructions_array[index_of_instructions];
+    // Check if we want the new_value to be integer.
+    if (instructions.c_is_int) {
+        if (!is_integer(new_value)) return;
     }
 
-    write_config(new_config, new_config_size + 4);
+    size_t config_array_s = 0;
+    char **config_array = get_config_array(&config_array_s);
+    if (config_array == NULL) return;
 
-    free(items);
-    free(options_string_form);
-    free(items_string_form);
-    free(new_config);
-    free(missing);
-}
-
-
-char *get_missing_part(char *config, char *begin, char *end, int item_count) {
-    // BackUp the items.
-    char *tmp = calloc(strlen(config) + 1, sizeof(char));
-    strcpy(tmp, config);
-
-    char *missing_part;
-    char *start;
-    if (strcmp(begin, CHECK_IDENTIFIER) == 0) {
-        start = strstr(tmp, TARGET_IDENTIFIER);
-        missing_part = calloc(strlen(start) + 1, sizeof(char));
-        strcpy(missing_part, start);
-        free(tmp);
-        return missing_part;
+    int index_of_interest = 0;
+    for (int curr_option = 0; curr_option < config_array_s; curr_option++) {
+        if (strstr(config_array[curr_option], instructions.c_attributes[0])) index_of_interest = curr_option;
     }
-    start = strstr(tmp, CHECK_IDENTIFIER);
-    // if check.
-    // store all the check items.
-    char **items_tmp = calloc(item_count + 1, sizeof(char *));
-    start = strtok(start, SPLITTER);
+    if (index_of_interest == 0) return;
 
-    // save the items.
-    int curr_item = 0;
-    size_t curr_len;
-    size_t total_len = 0;
-    while (strcmp(start, CHECK_DONE_IDENTIFIER) != 0) {
-        curr_len = strlen(start);
-        items_tmp[curr_item] = calloc(curr_len + 1, sizeof(char));
-        strcpy(items_tmp[curr_item], start);
-        start = strtok(NULL, SPLITTER);
-        total_len += curr_len;
-        curr_item++;
-    }
-    // allocate enough space in tmp and form the missing string.
-    missing_part = calloc(total_len + strlen(end) + curr_item + 4, sizeof(char));
-    // save the items.
-    for (int item = 0; item < curr_item; item++) {
-        strcat(missing_part, items_tmp[item]);
-        strcat(missing_part, CHANGE_LINE);
-    }
-    strcat(missing_part, CHANGE_LINE);
-    strcat(missing_part, CHECK_DONE_IDENTIFIER);
-
-    for (int item = 0; item < curr_item; item++) free(items_tmp[item]);
-    free(items_tmp);
-    free(tmp);
-
-    return missing_part;
-}
-
-char *convert_array_to_string(char **array, int array_size) {
-    size_t total_size = 0;
-
-    if (array_size == 1) {
-        char *tmp = calloc(strlen(array[0]) + 1, sizeof(char));
-        strcpy(tmp, array[0]);
-        return tmp;
-    }
-
-    // calculate the total size of the new string.
-    for (int element = 0; element < array_size; element++) total_size += strlen(array[element]);
-
-    // allocate the space of the new string.
-    char *string_form = calloc(total_size + array_size + 1, sizeof(char));
-    // save each element on the as sequence of strings.
-    for (int element = 0; element < array_size; element++) {
-        strcat(string_form, array[element]);
-        strcat(string_form, CHANGE_LINE);
-    }
-
-    return string_form;
-}
-
-int count_items(char *items, char *begin, char *end) {
-    // copy the same items as the original, in the tmp.
-    char *tmp = calloc(strlen(items) + 1, sizeof(char));
-    strcpy(tmp, items);
-    // go to the desire location
-    char *tmp_items = strstr(tmp, begin);
-
-    // count the items.
-    int count = 0;
-    char *curr_item = strtok(tmp_items, SPLITTER);
-    while (strcmp(curr_item, end) != 0) {
-        count++;
-        curr_item = strtok(NULL, SPLITTER);
-    }
-    free(tmp);
-    return count - 1;
-}
-
-void set_option(char *option, char **options,
-                char *new_value, int index,
-                char *missing, size_t prev_conf_size) {
-
-    // Allocate space for the interested string.
-    size_t new_option_size = strlen(option) + strlen(new_value) + 2;
-    char *changed_option = calloc(new_option_size, sizeof(char));
-    // form the new option.
-    strcpy(changed_option, option);
+    // Form the changed option.
+    char *changed_option;
+    ALLOCATE_MEMORY(changed_option, strlen(instructions.c_attributes[0]) + strlen(new_value) + 2, sizeof(char));
+    strcpy(changed_option, instructions.c_attributes[0]);
     strcat(changed_option, " ");
     strcat(changed_option, new_value);
 
-    // calculate the size of the new config.
-    size_t old_option_size = strlen(options[index]);
-    size_t def_of_size = (new_option_size > old_option_size) ? (new_option_size - old_option_size) : (old_option_size -
-                                                                                                      new_option_size);
-    size_t new_conf_size = (new_option_size > old_option_size) ? (prev_conf_size + def_of_size) : (prev_conf_size -
-                                                                                                   def_of_size);
+    // Set the changed option in the right place.
+    free(config_array[index_of_interest]);
+    config_array[index_of_interest] = changed_option;
 
-    // temporary save the changed option.
-    options[index] = changed_option;
-    // form the new config.
-    char *new_config = calloc(new_conf_size, sizeof(char));
+    // Rebuild the config file.
+    char *config = array_to_config((const char **) config_array, config_array_s);
+    if (write_config(config, strlen(config)) == -1) return;
 
-    strcpy(new_config, options[0]);
-    for (int save = 1; save < OPTION_NUMBER; save++) {
-        strcat(new_config, CHANGE_LINE);
-        strcat(new_config, options[save]);
-    }
-    strcat(new_config, CHANGE_LINE);
-    strcat(new_config, CHANGE_LINE);
-    strcat(new_config, missing);
-
-    // save the changes.
-    write_config(new_config, new_conf_size - 1);
-    free(new_config);
-    free(changed_option);
-}
-
-int is_valid_int_value(char *value, char **result, int return_int_res) {
-
-    char *integer = malloc((strlen(value) + 1) * sizeof(char));
-    strcpy(integer, value);
-
-    int check = strtol(value, &value, 10);
-
-    if (check == 0 && integer[0] != '0') {
-        return -1;
-    }
-    if (return_int_res) return check;
-
-    *result = integer;
-    return 1;
-}
-
-void list(char *begin, char *end) {
-    char *config = NULL;
-
-    if (read_config(&config) == -1) return;
-
-    char *start = strstr(config, begin);
-    char *curr_item = strtok(start, SPLITTER);
-    int counter = 1;
-
-    if (start != NULL) {
-        while (curr_item != NULL && strcmp(curr_item, end) != 0) {
-            if (strcmp(begin, curr_item) == 0) {
-                curr_item = strtok(NULL, SPLITTER);
-                continue;
-            }
-            printf(" [%d] %s\n", counter, curr_item);
-            curr_item = strtok(NULL, SPLITTER);
-            counter++;
-        }
-
-    }
+    FREE_ARRAY(config_array, config_array_s);
     free(config);
+}
+
+/**
+ * Right shift the array from a specific index and right.
+ * @param array The array to be shift.
+ * @param array_s The size of the array.
+ * @param point The index from where we want to shift.
+ */
+static inline void right_shift_array(char **array, size_t array_s, int point) {
+    if (point > array_s) return;
+
+    char *tmp = NULL;
+    for (size_t curr_element = (array_s - 1); curr_element >= point; curr_element--) {
+        //printf("Swap: A = %s, B = %s\n", array[curr_element + 1], array[curr_element]);
+        tmp = array[curr_element];
+        array[curr_element] = array[curr_element + 1];
+        array[curr_element + 1] = tmp;
+    }
+
+}
+
+static inline int find_text_in_array(const char **array, size_t array_s, const char *text) {
+    for (int index = 0; index < array_s; index++) {
+        if (!strcmp(array[index], text)) return index;
+    }
+    return -1;
+}
+
+void add_to_list(const char *where_to_add, const char *value_to_add) {
+    int index_of_instruction = get_instructions(where_to_add);
+    if (index_of_instruction == -1) return;
+
+    struct command_instructions instructions = c_instructions_array[index_of_instruction];
+
+    size_t config_array_s = 0;
+    char **config_array = get_config_array(&config_array_s);
+    if (config_array == NULL) return;
+
+    // Find where the list in the config ends.
+    int index_of_done = find_text_in_array((const char **) config_array, config_array_s, instructions.c_attributes[1]);
+    // Allocate the space for the extended array.
+    ++config_array_s;
+
+    REALLOCATE_MEMORY(config_array, config_array_s, sizeof(char *));
+    // Shift right the array to make new place for the new value.
+    right_shift_array(config_array, config_array_s - 1, index_of_done);
+
+    // Copy the value to add, using malloc, so we can free it later.
+    char *tmp;
+    ALLOCATE_MEMORY(tmp, strlen(value_to_add) + 1, sizeof(char));
+    strcpy(tmp, value_to_add);
+    // Set the new value in the place where it has to be.
+    config_array[index_of_done] = tmp;
+
+    // Free old config and build the new one.
+    char *config = array_to_config((const char **) config_array, config_array_s);
+
+    // Write back the config.
+    if (write_config(config, strlen(config)) == -1) return;
+
+    FREE_ARRAY(config_array, config_array_s);
+    free(config);
+}
+
+void remove_from_list(const char *from_where, char *row_number) {
+    int index_of_instruction = get_instructions(from_where);
+    if (index_of_instruction == -1) return;
+
+    struct command_instructions instructions = c_instructions_array[index_of_instruction];
+
+    size_t config_array_s = 0;
+    char **config_array = get_config_array(&config_array_s);
+
+    if (config_array == NULL) return;
+
+    int list_start_index = find_text_in_array((const char **) config_array, config_array_s, instructions.c_attributes[0]);
+    int int_row_number = (int) strtol(row_number, &row_number, 10);
+    int index_to_delete = list_start_index + int_row_number;
+    if (index_to_delete >= config_array_s) return;
+
+    if (!strcmp(config_array[index_to_delete], instructions.c_attributes[0])
+     || !strcmp(config_array[index_to_delete], instructions.c_attributes[1])) {
+        FREE_ARRAY(config_array, config_array_s);
+        return;
+    }
+
+    free(config_array[index_to_delete]);
+    config_array[index_to_delete] = NULL;
+
+    char *config = array_to_config((const char **) config_array, config_array_s);
+
+    // Write back the config.
+    if (write_config(config, strlen(config)) == -1) return;
+
+    FREE_ARRAY(config_array, config_array_s);
+    free(config);
+
 }
