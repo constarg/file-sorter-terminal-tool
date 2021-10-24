@@ -189,6 +189,7 @@ void set_value(const char *option, const char *new_value) {
     // Here we replace the old value with the new.
     size_t config_array_s = 0;
     char **config_array = config_to_array(config, &config_array_s);
+    if (config_array_s == 0) return;
 
     int index_of_interest = 0;
     for (int curr_option = 0; curr_option < config_array_s; curr_option++) {
@@ -216,12 +217,6 @@ void set_value(const char *option, const char *new_value) {
     free(config);
 }
 
-static inline void swap(void *a, void *b) {
-    void *tmp = &a;
-    a = &b;
-    b = &tmp;
-}
-
 /**
  * Right shift the array from a specific index and right.
  * @param array The array to be shift.
@@ -231,12 +226,21 @@ static inline void swap(void *a, void *b) {
 static inline void right_shift_array(char **array, size_t array_s, int point) {
     if (point > array_s) return;
 
-    // Allocate the space for the extended array.
-    REALLOCATE_MEMORY(array, array_s + 1, sizeof(char *));
-    ALLOCATE_MEMORY(array[array_s], strlen(array[array_s - 1]), sizeof(char)); // Initialize the extra space.
+    char *tmp = NULL;
+    for (size_t curr_element = (array_s - 1); curr_element >= point; curr_element--) {
+        //printf("Swap: A = %s, B = %s\n", array[curr_element + 1], array[curr_element]);
+        tmp = array[curr_element];
+        array[curr_element] = array[curr_element + 1];
+        array[curr_element + 1] = tmp;
+    }
 
-    for (size_t curr_element = (array_s - 1); curr_element > point; curr_element--)
-        swap(array[curr_element], array[curr_element + 1]);
+}
+
+static inline int find_text_in_array(const char **array, size_t array_s, const char *text) {
+    for (int index = 0; index < array_s; index++) {
+        if (!strcmp(array[index], text)) return index;
+    }
+    return -1;
 }
 
 void add_to_list(const char *where_to_add, const char *value_to_add) {
@@ -245,11 +249,38 @@ void add_to_list(const char *where_to_add, const char *value_to_add) {
 
     struct command_instructions instructions = c_instructions_array[index_of_instruction];
 
+    // Read the config.
+    char *config = read_config();
+    if (config == NULL) return;
 
+    // convert config in array.
+    size_t config_array_s = 0;
+    char **config_array = config_to_array(config, &config_array_s);
+    if (config_array_s == 0) return;
+    // Find where the list in the config ends.
+    int index_of_done = find_text_in_array((const char **) config_array, config_array_s, instructions.c_attributes[1]);
+    // Allocate the space for the extended array.
+    ++config_array_s;
+    REALLOCATE_MEMORY(config_array, config_array_s, sizeof(char *));
+    // Shift right the array to make new place for the new value.
+    right_shift_array(config_array, config_array_s - 1, index_of_done);
 
+    // Copy the value to add, using malloc, so we can free it later.
+    char *tmp;
+    ALLOCATE_MEMORY(tmp, strlen(value_to_add) + 1, sizeof(char));
+    strcpy(tmp, value_to_add);
+    // Set the new value in the place where it has to be.
+    config_array[index_of_done] = tmp;
 
-    // TODO - Use the shift array function to make an empty space in the desire location.
-    // TODO - Make this function.
+    // Free old config and build the new one.
+    free(config);
+    config = array_to_config((const char **) config_array, config_array_s);
+
+    // Write back the config.
+    if (write_config(config, strlen(config)) == -1) return;
+
+    FREE_ARRAY(config_array, config_array_s);
+    free(config);
 }
 
 void remove_from_list(const char *from_where, const char *row_number) {
