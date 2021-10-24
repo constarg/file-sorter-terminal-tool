@@ -52,7 +52,7 @@ void parse_args(int argc, char **argv) {
 
     if ((argc - 2) < commands[command_to_exec].c_argc) unrecognized_option();
 
-    if (commands[command_to_exec].c_argc == 0) commands[command_to_exec].c_func();
+    if      (commands[command_to_exec].c_argc == 0) /* void func */ commands[command_to_exec].c_func();
     else if (commands[command_to_exec].c_argc == 1) ((func_arg_1 *) commands[command_to_exec].c_func)(argv[2]);
     else if (commands[command_to_exec].c_argc == 2) ((func_arg_2 *) commands[command_to_exec].c_func)(argv[2], argv[3]);
 }

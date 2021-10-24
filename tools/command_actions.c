@@ -111,7 +111,6 @@ static int is_integer(const char *value) {
     int found = FALSE;
     char *digits_first_address = &digits[0];
 
-    // TODO - Make the below method using the binary search algorithm, to decrease the complexity.
     while (*value) {
         digits = digits_first_address;
         found = FALSE;
@@ -217,24 +216,27 @@ void set_value(const char *option, const char *new_value) {
     free(config);
 }
 
+static inline void swap(void *a, void *b) {
+    void *tmp = &a;
+    a = &b;
+    b = &tmp;
+}
+
 /**
- * Left shift the array from a specific index and left.
+ * Right shift the array from a specific index and right.
  * @param array The array to be shift.
  * @param array_s The size of the array.
  * @param point The index from where we want to shift.
  */
-static inline void left_shift_array(char **array, size_t *array_s, int point) {
-    if (point > *array_s) return;
+static inline void right_shift_array(char **array, size_t array_s, int point) {
+    if (point > array_s) return;
 
-    const int how_much_to_shift = 1; // No need for more.
     // Allocate the space for the extended array.
-    REALLOCATE_MEMORY(array, (*array_s) + 1, sizeof(char *));
-    ALLOCATE_MEMORY(array[*array_s], strlen(array[(*array_s) - 1]), sizeof(char)); // Initialize the extra space.
-    ++(*array_s);
+    REALLOCATE_MEMORY(array, array_s + 1, sizeof(char *));
+    ALLOCATE_MEMORY(array[array_s], strlen(array[array_s - 1]), sizeof(char)); // Initialize the extra space.
 
-    // Shift left.
-    for (size_t curr_element = (*array_s - 2); curr_element > point; curr_element--)
-        array[curr_element + 1] = array[curr_element];
+    for (size_t curr_element = (array_s - 1); curr_element > point; curr_element--)
+        swap(array[curr_element], array[curr_element + 1]);
 }
 
 void add_to_list(const char *where_to_add, const char *value_to_add) {
@@ -242,6 +244,9 @@ void add_to_list(const char *where_to_add, const char *value_to_add) {
     if (index_of_instruction == -1) return;
 
     struct command_instructions instructions = c_instructions_array[index_of_instruction];
+
+
+
 
     // TODO - Use the shift array function to make an empty space in the desire location.
     // TODO - Make this function.
