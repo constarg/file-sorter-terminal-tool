@@ -31,10 +31,10 @@ extern void add_to_list(const char *option, const char *value_to_add);
 
 /**
  * Removes an element from a specific list.
- * @param option The option that contains the list.
+ * @param from_where The option that contains the list.
  * @param row_number The the position of the element to be deleted.
  */
-extern void remove_from_list(const char *option, const char *row_number);
+extern void remove_from_list(const char *from_where, char *row_number);
 
 /**
  * List the contents of a specific element.
@@ -105,7 +105,7 @@ static inline void add_target(const char *target_path, const char *target_ext) {
  * Remove the target in a specific row line.
  * @param row_line The row line of the target to be removed.
  */
-static inline void remove_target(const char *row_line) {
+static inline void remove_target(char *row_line) {
     remove_from_list(REMOVE_TARGET, row_line);
 }
 
@@ -113,7 +113,7 @@ static inline void remove_target(const char *row_line) {
  * Remove the check in a specific row line.
  * @param row_line The row line of the check to be removed.
  */
-static inline void remove_check(const char *row_line) {
+static inline void remove_check(char *row_line) {
     remove_from_list(REMOVE_CHECK, row_line);
 }
 

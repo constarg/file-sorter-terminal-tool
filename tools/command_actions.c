@@ -151,6 +151,22 @@ static char **config_to_array(const char *config, size_t *size) {
     return config_array;
 }
 
+static char **get_config_array(size_t *array_s) {
+    // Read the config.
+    char *config = read_config();
+    if (config == NULL) return NULL;
+
+    // convert config in array.
+    size_t config_array_s = 0;
+    char **config_array = config_to_array(config, &config_array_s);
+    if (config_array_s == 0) return NULL;
+
+    *array_s = config_array_s;
+
+    free(config);
+    return config_array;
+}
+
 static char *array_to_config(const char **array, size_t array_s) {
     size_t config_s = strlen(array[0]);
     char *config;
@@ -159,6 +175,8 @@ static char *array_to_config(const char **array, size_t array_s) {
 
 
     for (int curr_element = 1; curr_element < array_s; curr_element++) {
+        if (array[curr_element] == NULL) continue;
+
         config_s += strlen(array[curr_element]) + 2;
         REALLOCATE_MEMORY(config, config_s + 1, sizeof(char));
         strcat(config, "\n");
@@ -183,13 +201,9 @@ void set_value(const char *option, const char *new_value) {
         if (!is_integer(new_value)) return;
     }
 
-    char *config = read_config();
-    if (config == NULL) return;
-
-    // Here we replace the old value with the new.
     size_t config_array_s = 0;
-    char **config_array = config_to_array(config, &config_array_s);
-    if (config_array_s == 0) return;
+    char **config_array = get_config_array(&config_array_s);
+    if (config_array == NULL) return;
 
     int index_of_interest = 0;
     for (int curr_option = 0; curr_option < config_array_s; curr_option++) {
@@ -209,8 +223,7 @@ void set_value(const char *option, const char *new_value) {
     config_array[index_of_interest] = changed_option;
 
     // Rebuild the config file.
-    free(config);
-    config = array_to_config((const char **) config_array, config_array_s);
+    char *config = array_to_config((const char **) config_array, config_array_s);
     if (write_config(config, strlen(config)) == -1) return;
 
     FREE_ARRAY(config_array, config_array_s);
@@ -249,18 +262,15 @@ void add_to_list(const char *where_to_add, const char *value_to_add) {
 
     struct command_instructions instructions = c_instructions_array[index_of_instruction];
 
-    // Read the config.
-    char *config = read_config();
-    if (config == NULL) return;
-
-    // convert config in array.
     size_t config_array_s = 0;
-    char **config_array = config_to_array(config, &config_array_s);
-    if (config_array_s == 0) return;
+    char **config_array = get_config_array(&config_array_s);
+    if (config_array == NULL) return;
+
     // Find where the list in the config ends.
     int index_of_done = find_text_in_array((const char **) config_array, config_array_s, instructions.c_attributes[1]);
     // Allocate the space for the extended array.
     ++config_array_s;
+
     REALLOCATE_MEMORY(config_array, config_array_s, sizeof(char *));
     // Shift right the array to make new place for the new value.
     right_shift_array(config_array, config_array_s - 1, index_of_done);
@@ -273,8 +283,7 @@ void add_to_list(const char *where_to_add, const char *value_to_add) {
     config_array[index_of_done] = tmp;
 
     // Free old config and build the new one.
-    free(config);
-    config = array_to_config((const char **) config_array, config_array_s);
+    char *config = array_to_config((const char **) config_array, config_array_s);
 
     // Write back the config.
     if (write_config(config, strlen(config)) == -1) return;
@@ -283,6 +292,37 @@ void add_to_list(const char *where_to_add, const char *value_to_add) {
     free(config);
 }
 
-void remove_from_list(const char *from_where, const char *row_number) {
-    // TODO - Make this function.
+void remove_from_list(const char *from_where, char *row_number) {
+    int index_of_instruction = get_instructions(from_where);
+    if (index_of_instruction == -1) return;
+
+    struct command_instructions instructions = c_instructions_array[index_of_instruction];
+
+    size_t config_array_s = 0;
+    char **config_array = get_config_array(&config_array_s);
+
+    if (config_array == NULL) return;
+
+    int list_start_index = find_text_in_array((const char **) config_array, config_array_s, instructions.c_attributes[0]);
+    int int_row_number = (int) strtol(row_number, &row_number, 10);
+    int index_to_delete = list_start_index + int_row_number;
+    if (index_to_delete >= config_array_s) return;
+
+    if (!strcmp(config_array[index_to_delete], instructions.c_attributes[0])
+     || !strcmp(config_array[index_to_delete], instructions.c_attributes[1])) {
+        FREE_ARRAY(config_array, config_array_s);
+        return;
+    }
+
+    free(config_array[index_to_delete]);
+    config_array[index_to_delete] = NULL;
+
+    char *config = array_to_config((const char **) config_array, config_array_s);
+
+    // Write back the config.
+    if (write_config(config, strlen(config)) == -1) return;
+
+    FREE_ARRAY(config_array, config_array_s);
+    free(config);
+
 }

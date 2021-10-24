@@ -27,7 +27,7 @@ static struct a_command commands[NUMBER_OF_COMMANDS] = {
         {.c_name = ADD_CHECK,             .c_func = (generic *) &add_check,              .c_argc = 1},
         {.c_name = ADD_TARGET,            .c_func = (generic *) &add_target,             .c_argc = 2},
         {.c_name = REMOVE_CHECK,          .c_func = (generic *) &remove_check,           .c_argc = 1},
-        {.c_name = REMOVE_TARGET,         .c_func = (generic *) &remove_target,          .c_argc = 2},
+        {.c_name = REMOVE_TARGET,         .c_func = (generic *) &remove_target,          .c_argc = 1},
         {.c_name = LIST_CHECKS,           .c_func = (generic *) &list_checks,            .c_argc = 0},
         {.c_name = LIST_TARGETS,          .c_func = (generic *) &list_targets,           .c_argc = 0},
         {.c_name = LIST_OPTIONS,          .c_func = (generic *) &list_options,           .c_argc = 0},
