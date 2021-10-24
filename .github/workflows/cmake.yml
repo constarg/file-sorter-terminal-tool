@@ -1,4 +1,4 @@
-name: File-Sorter-Terminal-Toll Build
+name: File-Sorter-Terminal-Tool Build
 
 on:
   push:
