@@ -12,6 +12,8 @@
 
 #define INSTRUCTION_ARRAY_S 12
 
+#define SUCCESS() printf("OK\n");
+
 struct command_instructions {
     char  *c_name;          // command name.
     char  *c_attributes[2]; // command attributes.
@@ -45,7 +47,9 @@ const char usage[] = "Usage:\n \tsorter [OPTION] ...\n\n"
                      "\t--remove-target           [row number] remove target.\n"
                      "\t--list-checks list checks.\n"
                      "\t--list-targets list targets.\n"
-                     "\t--list-options list options.\n";
+                     "\t--list-options list options.\n\n\n"
+                     "Each of the above commands will print an OK message on success.\n"
+                     "Check https://github.com/rounnus/File-Sorter-Core for more information's about the project!.\n";
 
 const char unrecognized[] = "sorter: unrecognized option...\n"
                             "Try 'sorter --help' for more information.\n";
@@ -228,6 +232,7 @@ void set_value(const char *option, const char *new_value) {
 
     FREE_ARRAY(config_array, config_array_s);
     free(config);
+    SUCCESS();
 }
 
 /**
@@ -290,6 +295,7 @@ void add_to_list(const char *where_to_add, const char *value_to_add) {
 
     FREE_ARRAY(config_array, config_array_s);
     free(config);
+    SUCCESS();
 }
 
 void remove_from_list(const char *from_where, char *row_number) {
@@ -324,5 +330,5 @@ void remove_from_list(const char *from_where, char *row_number) {
 
     FREE_ARRAY(config_array, config_array_s);
     free(config);
-
+    SUCCESS();
 }
