@@ -41,7 +41,7 @@ Command |  Description
 `sorter --list-options` | Displays the program options.
 
 For more information on what each of the fields is, please read the core readme below:<br>
-https://github.com/rounnus/File-Sorter-Core
+https://github.com/rounnus/file-sorter-core
 
 # Compatible operating systems
 - [X] Linux
