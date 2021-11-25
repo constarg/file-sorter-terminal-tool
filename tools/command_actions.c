@@ -49,7 +49,7 @@ const char usage[] = "Usage:\n \tsorter [OPTION] ...\n\n"
                      "\t--list-targets list targets.\n"
                      "\t--list-options list options.\n\n\n"
                      "Each of the above commands will print an OK message on success.\n"
-                     "Check https://github.com/rounnus/File-Sorter-Core for more information's about the project!.\n";
+                     "Check https://github.com/rounnus/file-sorter-core for more information's about the project!.\n";
 
 const char unrecognized[] = "sorter: unrecognized option...\n"
                             "Try 'sorter --help' for more information.\n";
