@@ -1,6 +1,13 @@
 [![File-Sorter-Terminal-Toll Build](https://github.com/rounnus/File-Sorter-Terminal-Tool/actions/workflows/cmake.yml/badge.svg?branch=main)](https://github.com/rounnus/File-Sorter-Terminal-Tool/actions/workflows/cmake.yml)
 # File-Sorter-Terminal-Tool
 File sorter management tool. https://github.com/rounnus/file-sorter-core
+
+# Installation requirements
+The following packages must be installed.<br>
+```
+sudo apt-get install build-essential cmake git gcc
+```
+
 # Download & Build
 First download the program from github and go to the file-sorter-terminal-tool folder.
 ```
