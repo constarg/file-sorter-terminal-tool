@@ -54,3 +54,6 @@ dkms.conf
 /cmake-build-release
 .idea/
 build
+include/tool_builder
+
+*.swp
