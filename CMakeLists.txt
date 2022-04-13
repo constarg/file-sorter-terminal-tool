@@ -3,7 +3,7 @@ project(file_sorter_terminal_Tool C)
 
 set(CMAKE_C_STANDARD 17)
 
-set(HEADERS_FILES )
+set(HEADERS_FILES include/tool_builder/tool_builder.h)
 set(SOURCE_FILES main.c)
 
 set(TOOL_BUILDER_REL v1.5)
