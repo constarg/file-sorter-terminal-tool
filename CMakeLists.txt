@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD 17)
 set(HEADERS_FILES )
 set(SOURCE_FILES main.c)
 
-set(TOOL_BUILDER_REL v1.2)
+set(TOOL_BUILDER_REL v1.5)
 set(TOOL_BUILDER https://github.com/rounnus/terminal-tool-builder-lib/releases/download/${TOOL_BUILDER_REL}/libtoolbuilder.a)
 set(TOOL_BUILDER_DEST ../lib/libtoolbuilder.a)
 
