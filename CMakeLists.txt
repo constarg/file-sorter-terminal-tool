@@ -3,8 +3,8 @@ project(file_sorter_terminal_Tool C)
 
 set(CMAKE_C_STANDARD 17)
 
-set(HEADERS_FILES include/tool_builder/tool_builder.h include/actions.h)
-set(SOURCE_FILES main.c src/actions.c)
+set(HEADERS_FILES include/tool_builder/tool_builder.h include/actions.h include/config.h)
+set(SOURCE_FILES main.c src/actions.c src/config.c)
 
 set(TOOL_BUILDER_REL v1.5)
 set(TOOL_BUILDER https://github.com/rounnus/terminal-tool-builder-lib/releases/download/${TOOL_BUILDER_REL}/libtoolbuilder.a)
