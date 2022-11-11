@@ -11,7 +11,7 @@ sudo apt-get install build-essential cmake git gcc
 # Download & Build
 First download the program from github and go to the file-sorter-terminal-tool folder.
 ```
-% git clone https://github.com/rounnus/file-sorter-terminal-tool
+% git clone https://github.com/EmbeddedCat/file-sorter-terminal-tool
 % cd file-sorter-terminal-tool/
 ```
 After installation the program must be built. In order to build the program, the following instructions must be followed.<br>
