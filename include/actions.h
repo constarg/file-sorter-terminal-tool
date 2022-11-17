@@ -6,19 +6,19 @@
  * Change the value of the check interval option
  * in config file.
  */
-extern void set_check_interval(const char *n_value);
+extern int set_check_interval(const char *n_value);
 
 /**
  * Change the value of the parse interval option
  * in config file.
  */
-extern void set_parse_interval(const char *n_value);
+extern int set_parse_interval(const char *n_value);
 
 /**
  * Change the default dir path, where the
  * files sent when no rule has been set.
  */
-extern void set_default_dir_path(const char *n_path);
+extern int set_default_dir_path(const char *n_path);
 
 /**
  * Enable or disable the default dir
@@ -26,7 +26,7 @@ extern void set_default_dir_path(const char *n_path);
  * the value of the corresponded value
  * in config file.
  */
-extern void set_enable_default_dir(const char *n_state);
+extern int set_enable_default_dir(const char *n_state);
 
 /**
  * Enable or disable the debug log
@@ -34,66 +34,66 @@ extern void set_enable_default_dir(const char *n_state);
  * the value of the corresponded value
  * in config file.
  */
-extern void set_debug_log(const char *n_state);
+extern int set_debug_log(const char *n_state);
 
 // list manipulation commands.
 /**
  * Add a new path on the check list that the core
  * will scan for files.
  */
-extern void add_check(const char *path);
+extern int add_check(const char *path);
 
 /**
  * Add a new rule on the target list that the core
  * checks in order to organize the files.
  * @param args The information that the builder pass to the callback.
  */
-extern void add_target(const char *ext, const char *path);
+extern int add_target(const char *ext, const char *path);
 
 /**
  * Add a new rule on the exlude list that the core
  * checks in order to exclude files.
  */
-extern void add_exclude(const char *ext, const char *path);
+extern int add_exclude(const char *ext, const char *path);
 
 /**
  * Remove a path from the check list that the core
  * will scan for files.
  */
-extern void remove_check(const char *row);
+extern int remove_check(const char *row);
 
 /**
  * Remove a rule from the target list that the core
  * checks in order to organize the files.
  */
-extern void remove_target(const char *row);
+extern int remove_target(const char *row);
 
 /**
  * Remove a rule from the exlude list that the core
  * checks in order to exclude files.
  */
-extern void remove_exclude(const char *row);
+extern int remove_exclude(const char *row);
 
 // Show commands.
 /**
  * Show the available options.
  */
-extern void list_options();
+extern int list_options();
 
 /**
  * Show the list of path's in check list.
  * @param args The information that the builder pass to the callback.
  */
-extern void list_checks();
+extern int list_checks();
 
 /**
  * Show the list of rules in target list.
  */
-extern void list_targets();
+extern int list_targets();
 
 /**
  * Show the list of rules in exclude list.
  */
-extern void list_excludes();
+extern int list_excludes();
 
 #endif

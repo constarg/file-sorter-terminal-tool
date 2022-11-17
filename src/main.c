@@ -2,11 +2,25 @@
 #include <string.h>
 #include <stdio.h>
 
-static const char *help_msg =  "";
+const char usage[] = "Usage:\n \tsorter [OPTION] ...\n\n"
+                     "\t--set-check-interval      [value] Change the value of check interval.\n"
+                     "\t--set-parse-interval      [value] Change the value of parse interval.\n"
+                     "\t--set-default-dir-path    [path] Change the default directory path.\n"
+                     "\t--set-enable-default-dir  [value] 0:1 Enable the to transfer files in default dir.\n"
+                     "\t--set-debug-log           [value] 0:1 Change the log to debug mode (1).\n"
+                     "\t--add-check               [path] Add new check.\n"
+                     "\t--add-target              [ext] [path] Add new target.\n"
+                     "\t--remove-check            [row number] remove check.\n"
+                     "\t--remove-target           [row number] remove target.\n"
+                     "\t--list-checks list checks.\n"
+                     "\t--list-targets list targets.\n"
+                     "\t--list-options list options.\n\n\n"
+                     "Each of the above commands will print an OK message on success.\n"
+                     "Check https://github.com/rounnus/file-sorter-core for more information's about the project!.\n";
 
 static int help()
 {
-    return printf("%s\n", help_msg);
+    return printf("%s\n", usage);
 }
 
 
