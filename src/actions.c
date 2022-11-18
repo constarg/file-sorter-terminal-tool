@@ -1,9 +1,19 @@
-#include <actions.h>
 #include <stdio.h>
 
-static void change_value()
+#include "actions.h"
+#include "config.h"
+
+/**
+ * This functions chagnes a value of one of
+ * the options in the config file.
+ * @param n_value The new value to write.
+ * @param wtchange The option to change.
+ */
+static void change_value(const char *n_value,
+                         const char *wtchange)
 {
-  
+    
+
 }
 
 int set_check_interval(const char *n_value)

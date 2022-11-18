@@ -23,7 +23,7 @@ static inline int get_conf_path(char **dst)
     return 0;
 }
 
-int write_config(const char *src)
+int write_config(const struct conf *src)
 {
     char *conf_path = NULL;
     size_t size_src = strlen(src);
@@ -45,7 +45,7 @@ int write_config(const char *src)
     return 0;
 }
 
-int read_config(char **dst)
+int read_config(struct conf *dst)
 {
     char *conf_path = NULL;
     struct stat stat_buff;
@@ -69,7 +69,7 @@ int read_config(char **dst)
 
     // read the content of config file.
     if (fread(*dst, stat_buff.st_size,
-              1, conf) != stat_buff) {
+              1, conf) != stat_buff.st_size) {
         fclose(conf);
         return -1;
     }    
