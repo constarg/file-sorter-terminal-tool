@@ -12,7 +12,7 @@ struct conf_opt
 {
     char *c_check_intrv;      // Check interval.
     char *c_parse_intrv;      // Parse interval.
-    char *c_debu_log;         // Debug log.
+    char *c_debug_log;         // Debug log.
     char *c_default_dir_p;    // default directory path.
     char *c_enable_p;         // enable default directory.
 };
@@ -36,10 +36,11 @@ struct conf
 };
 
 
-static void init_conf(struct conf *src)
+static inline void init_conf(struct conf *src)
 {
     memset(src, 0x0, sizeof(struct conf));
 }
+
 
 /**
  * Write the config file contents.
@@ -54,7 +55,13 @@ extern int write_config(const struct conf *src);
  * @param dst The destination buffer.
  * @return 0 on success or -1 on error.
  */
-extern int read_config(struct conf *dst);
+extern int open_config(struct conf *dst);
 
+/**
+ * Close the config file, that was opened 
+ * using open_config.
+ * @param src The config file.
+ */
+extern void close_config(struct conf *src);
 
 #endif
