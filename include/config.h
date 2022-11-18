@@ -14,6 +14,7 @@ extern int write_config(const char *src);
  * @param dst The destination buffer.
  * @return 0 on success or -1 on error.
  */
-extern int read_config(char *dst);
+extern int read_config(char **dst);
+
 
 #endif
