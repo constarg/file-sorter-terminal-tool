@@ -16,7 +16,7 @@ static char *get_config_buff()
     // determine the absolute path of the config.
     char *username = getlogin();
     char *absolute = (char *) malloc(sizeof(char) * (strlen(CONF_PATH) + 
-    											     strlen(username)  + 7));
+                                                     strlen(username)  + 7));
     if (absolute == NULL) return NULL;
     
     strcpy(absolute, "/home/");
@@ -152,9 +152,9 @@ static void update_list(const char *(*list),
                         FILE *conf)
 {
     fprintf(conf, "%s\n", list_id);
-	for (int i = 0; (*list)[i]; i++) {
+    for (int i = 0; (*list)[i]; i++) {
         fprintf(conf, "%s\n", (*list)[i]);
-	}
+    }
     fprintf(conf, "[done]\n");
 }
 
@@ -162,13 +162,13 @@ int update_config(const struct config *src)
 {
     // determine the absolute path of the config.
     char *username = getlogin();
-	char *absolute = (char *) malloc(sizeof(char) * (strlen(CONF_PATH) + 
-												     strlen(username)  + 7));
-	if (absolute == NULL) return -1;
+    char *absolute = (char *) malloc(sizeof(char) * (strlen(CONF_PATH) + 
+                                                     strlen(username)  + 7));
+    if (absolute == NULL) return -1;
 
-	strcpy(absolute, "/home/");
-	strcat(absolute, username);
-	strcat(absolute, CONF_PATH);	
+    strcpy(absolute, "/home/");
+    strcat(absolute, username);
+    strcat(absolute, CONF_PATH);	
 
     // open the file.
     FILE *conf = fopen(absolute, "w");
