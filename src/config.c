@@ -127,13 +127,13 @@ void parse_config(struct config *dst)
     	
     dst->c_options.o_check_interval = parse_int_opt(conf_buff, "check_interval");
     dst->c_options.o_parse_interval = parse_int_opt(conf_buff, "parse_interval");
-    dst->c_options.o_debug_log 		= parse_int_opt(conf_buff, "debug_log") & 0x1;
-    dst->c_options.o_default_path 	= parse_str_opt(conf_buff, "default_dir_path");
+    dst->c_options.o_debug_log      = parse_int_opt(conf_buff, "debug_log") & 0x1;
+    dst->c_options.o_default_path   = parse_str_opt(conf_buff, "default_dir_path");
     dst->c_options.o_enable_default = parse_int_opt(conf_buff, "enable_default_path") & 0x1;
-    dst->c_options.o_move_no_ext 	= parse_int_opt(conf_buff, "move_files_without_extention") & 0x1;
-    dst->c_lists.l_check_list 		= parse_list(conf_buff, "[check]");
-    dst->c_lists.l_target_list 		= parse_list(conf_buff, "[targets]");
-    dst->c_lists.l_exclude_list 	= parse_list(conf_buff, "[exclude]");
+    dst->c_options.o_move_no_ext    = parse_int_opt(conf_buff, "move_files_without_extention") & 0x1;
+    dst->c_lists.l_check_list       = parse_list(conf_buff, "[check]");
+    dst->c_lists.l_target_list      = parse_list(conf_buff, "[targets]");
+    dst->c_lists.l_exclude_list     = parse_list(conf_buff, "[exclude]");
     free(conf_buff);
 }
 
