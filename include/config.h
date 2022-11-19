@@ -7,7 +7,11 @@
 #define FAILED_TO_PARSE	-0x1
 
 
-// config options.
+/**
+ * ********************
+ *   Config Options
+ * ********************
+ */
 struct options
 {
 	unsigned int o_check_interval;		// check interval option.
@@ -18,7 +22,11 @@ struct options
 	unsigned int o_move_no_ext:1;		// move files that has no extention.
 };
 
-// config lists.
+/**
+ * ******************
+ *   Config Lists
+ * ******************
+ */
 struct lists
 {
 	char *(*l_check_list);			    // the check list of the config.
@@ -26,7 +34,11 @@ struct lists
 	char *(*l_exclude_list);		    // the excludes of the config.
 };
 
-// the config file.
+/**
+ *  ****************
+ *    Config file 
+ *  ****************
+ */
 struct config
 {
 	struct options c_options; 		// the options of the config.
@@ -51,5 +63,7 @@ static void inline init_config(struct config *config)
 extern void parse_config(struct config *dst);
 
 extern void destroy_config(struct config *src);
+
+extern int update_config(const struct config *src);
 
 #endif
