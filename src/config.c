@@ -70,6 +70,20 @@ static inline char *parse_str_opt(const char *conf_buff, const char *opt)
     return isolate_opt(conf_buff, opt); // get the str value.
 }
 
+static void update_list(const char *(*list),
+                        const char *list_id,
+                        FILE *conf)
+{
+    fprintf(conf, "%s\n", list_id);
+    if (list == NULL) goto empt;
+
+    for (int i = 0; list[i]; i++) {
+        if (list[i] == NULL) continue; // the case where it is NULL is when we remove an element.
+        fprintf(conf, "%s\n", list[i]);
+    }
+empt:fprintf(conf, "[done]\n\n");
+}
+
 static char **parse_list(const char *conf_buff, const char *list)
 {
     // locate the list.
@@ -110,16 +124,6 @@ static char **parse_list(const char *conf_buff, const char *list)
     return (char **) realloc(list_r, (real_l + 1) * sizeof(char *)); // adjust the size of the list.
 }
 
-static inline void free_list(char *(**list))
-{
-    if ((*list) == NULL) return;
-    for (int i = 0; (*list)[i]; i++) {
-        free((*list)[i]);
-    }
-    free(*list); 
-    *list = NULL;
-}
-
 void parse_config(struct config *dst)
 {
     char *conf_buff = get_config_buff();
@@ -131,9 +135,9 @@ void parse_config(struct config *dst)
     dst->c_options.o_default_path   = parse_str_opt(conf_buff, DEFAULT_DIR);
     dst->c_options.o_enable_default = parse_int_opt(conf_buff, EN_DEFAULT) & 0x1;
     dst->c_options.o_move_no_ext    = parse_int_opt(conf_buff, WITHOUT_EXT) & 0x1;
-    dst->c_lists.l_check_list       = parse_list(conf_buff, "[check]");
-    dst->c_lists.l_target_list      = parse_list(conf_buff, "[targets]");
-    dst->c_lists.l_exclude_list     = parse_list(conf_buff, "[exclude]");
+    dst->c_lists.l_check_list       = parse_list(conf_buff, CHECK_LISTID);
+    dst->c_lists.l_target_list      = parse_list(conf_buff, TARGET_LIST_ID);
+    dst->c_lists.l_exclude_list     = parse_list(conf_buff, EXCLUDE_LIST_ID);
     free(conf_buff);
 }
 
@@ -147,18 +151,6 @@ void destroy_config(struct config *src)
     free_list(&src->c_lists.l_exclude_list);
 }
 
-static void update_list(const char *(*list),
-                        const char *list_id,
-                        FILE *conf)
-{
-    fprintf(conf, "%s\n", list_id);
-    if (list == NULL) goto empt;
-
-    for (int i = 0; list[i]; i++) {
-        fprintf(conf, "%s\n", list[i]);
-    }
-empt:fprintf(conf, "[done]\n\n");
-}
 
 int update_config(const struct config *src)
 {
@@ -187,15 +179,15 @@ int update_config(const struct config *src)
     
     // write updated check list.
     update_list((const char **) src->c_lists.l_check_list,
-                "[check]",
+                CHECK_LISTID,
                 conf);
 
     update_list((const char **) src->c_lists.l_target_list,
-                "[targets]",
+                CHECK_LISTID,
                 conf);
 
     update_list((const char **) src->c_lists.l_exclude_list,
-                "[exclude]",
+                CHECK_LISTID,
                 conf);
 
     free(absolute);
