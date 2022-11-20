@@ -15,6 +15,14 @@ extern int set_check_interval(const char *n_value);
 extern int set_parse_interval(const char *n_value);
 
 /**
+ * Enable or disable the debug log
+ * feature. This works by changing
+ * the value of the corresponded value
+ * in config file.
+ */
+extern int set_debug_log(const char *n_state);
+
+/**
  * Change the default dir path, where the
  * files sent when no rule has been set.
  */
@@ -29,14 +37,14 @@ extern int set_default_dir_path(const char *n_path);
 extern int set_enable_default_dir(const char *n_state);
 
 /**
- * Enable or disable the debug log
- * feature. This works by changing
- * the value of the corresponded value
- * in config file.
+ * Enable or disable the feature to
+ * move the file without extention.
+ * @param n_state The new state 0 or 1.
  */
-extern int set_debug_log(const char *n_state);
+extern int set_mv_without_ext(const char *n_state);
 
-// list manipulation commands.
+
+  // list manipulation commands.
 /**
  * Add a new path on the check list that the core
  * will scan for files.

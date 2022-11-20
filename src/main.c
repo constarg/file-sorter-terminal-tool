@@ -30,10 +30,10 @@ int main(int argc, char *argv[])
         return help();
     } else if (!strcmp(argv[1], "--set-check-interval")) {
         if (argv[2] == NULL) return help();
-        set_check_interval(argv[1]);
+        set_check_interval(argv[2]);
     } else if (!strcmp(argv[1], "--set-parse-interval")) {
         if (argv[2] == NULL) return help();
-        set_parse_interval(argv[1]);
+        set_parse_interval(argv[2]);
     } else if (!strcmp(argv[1], "--set-default-dir-path")) {
         if (argv[2] == NULL) return help();
         set_default_dir_path(argv[2]);
@@ -43,6 +43,9 @@ int main(int argc, char *argv[])
     } else if (!strcmp(argv[1], "--set-debug-log")) {
         if (argv[2] == NULL) return help();
         set_debug_log(argv[2]);
+    } else if (!strcmp(argv[1], "--set-mv-without-ext")) {
+        if (argv[2] == NULL) return help();
+        set_mv_without_ext(argv[2]);
     } else if (!strcmp(argv[1], "--add-check")) {
         if (argv[2] == NULL) return help();
         add_check(argv[2]);

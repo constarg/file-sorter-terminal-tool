@@ -125,12 +125,12 @@ void parse_config(struct config *dst)
     char *conf_buff = get_config_buff();
     if (!conf_buff) return;
     	
-    dst->c_options.o_check_interval = parse_int_opt(conf_buff, "check_interval");
-    dst->c_options.o_parse_interval = parse_int_opt(conf_buff, "parse_interval");
-    dst->c_options.o_debug_log      = parse_int_opt(conf_buff, "debug_log") & 0x1;
-    dst->c_options.o_default_path   = parse_str_opt(conf_buff, "default_dir_path");
-    dst->c_options.o_enable_default = parse_int_opt(conf_buff, "enable_default_path") & 0x1;
-    dst->c_options.o_move_no_ext    = parse_int_opt(conf_buff, "move_files_without_extention") & 0x1;
+    dst->c_options.o_check_interval = parse_int_opt(conf_buff, CHECK_INT);
+    dst->c_options.o_parse_interval = parse_int_opt(conf_buff, PARSE_INT);
+    dst->c_options.o_debug_log      = parse_int_opt(conf_buff, DEBUG_LOG) & 0x1;
+    dst->c_options.o_default_path   = parse_str_opt(conf_buff, DEFAULT_DIR);
+    dst->c_options.o_enable_default = parse_int_opt(conf_buff, EN_DEFAULT) & 0x1;
+    dst->c_options.o_move_no_ext    = parse_int_opt(conf_buff, WITHOUT_EXT) & 0x1;
     dst->c_lists.l_check_list       = parse_list(conf_buff, "[check]");
     dst->c_lists.l_target_list      = parse_list(conf_buff, "[targets]");
     dst->c_lists.l_exclude_list     = parse_list(conf_buff, "[exclude]");
@@ -152,10 +152,12 @@ static void update_list(const char *(*list),
                         FILE *conf)
 {
     fprintf(conf, "%s\n", list_id);
-    for (int i = 0; (*list)[i]; i++) {
-        fprintf(conf, "%s\n", (*list)[i]);
+    if (list == NULL) goto empt;
+
+    for (int i = 0; list[i]; i++) {
+        fprintf(conf, "%s\n", list[i]);
     }
-    fprintf(conf, "[done]\n");
+empt:fprintf(conf, "[done]\n\n");
 }
 
 int update_config(const struct config *src)
@@ -176,11 +178,12 @@ int update_config(const struct config *src)
 
     // write updated options.
     fprintf(conf, "%s\n", "[basic_config]");
-    fprintf(conf, "check_interval %d\n",        src->c_options.o_check_interval);
-    fprintf(conf, "parse_interval %d\n",        src->c_options.o_parse_interval);
-    fprintf(conf, "debug_log %d\n",             src->c_options.o_debug_log);
-    fprintf(conf, "default_dir_path %s\n",      src->c_options.o_default_path);
-    fprintf(conf, "enable_default_path %d\n\n", src->c_options.o_enable_default);
+    fprintf(conf, "%s %d\n",   CHECK_INT,   src->c_options.o_check_interval);
+    fprintf(conf, "%s %d\n",   PARSE_INT,   src->c_options.o_parse_interval);
+    fprintf(conf, "%s %d\n",   DEBUG_LOG,   src->c_options.o_debug_log);
+    fprintf(conf, "%s %s\n",   DEFAULT_DIR, src->c_options.o_default_path);
+    fprintf(conf, "%s %d\n",   EN_DEFAULT,  src->c_options.o_enable_default);
+    fprintf(conf, "%s %d\n\n", WITHOUT_EXT, src->c_options.o_move_no_ext);
     
     // write updated check list.
     update_list((const char **) src->c_lists.l_check_list,
@@ -197,4 +200,6 @@ int update_config(const struct config *src)
 
     free(absolute);
     fclose(conf);
+
+    return 0;
 }
