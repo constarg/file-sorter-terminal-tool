@@ -6,12 +6,26 @@
 
 #define FAILED_TO_PARSE	-0x1
 
+/**
+ * *******************
+ *   		OPTIONS
+ * *******************
+ */
 #define CHECK_INT   "check_interval"
 #define PARSE_INT   "parse_interval"
 #define DEBUG_LOG   "debug_log"
 #define DEFAULT_DIR "default_dir_path"
 #define EN_DEFAULT  "enable_default_path"
 #define WITHOUT_EXT "move_files_without_ext"
+
+/**
+ * ******************
+ * 			LISTS
+ * ******************
+ */
+#define CHECK_LISTID 	  "[check]"
+#define TARGET_LIST_ID  "[targests]"
+#define EXCLUDE_LIST_ID "[exclude]"
 
 /**
  * ********************
@@ -59,6 +73,16 @@ struct config
 static void inline init_config(struct config *config)
 {
 		memset(config, 0x0, sizeof(struct config));
+}
+
+static inline void free_list(char *(**list))
+{
+    if ((*list) == NULL) return;
+    for (int i = 0; (*list)[i]; i++) {
+        free((*list)[i]);
+    }
+    free(*list); 
+    *list = NULL;
 }
 
 /**

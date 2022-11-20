@@ -30,11 +30,76 @@ static int change_opt_value(const char *n_value,
         free(conf.c_options.o_default_path);
         conf.c_options.o_default_path = (char *) strdup(n_value);
         // TODO - check if the path exist?
-    } else if (!strcmp(wtchange, EN_DEFAULT)) {
-        conf.c_options.o_enable_default = atoi(n_value) & 0x1;
     } else {
-        return -1;
+        conf.c_options.o_enable_default = atoi(n_value) & 0x1;
+    } 
+
+    if (update_config(&conf) == -1) return -1;
+    destroy_config(&conf);
+    return 0;
+}
+
+static inline size_t get_list_size(const char **list))
+{
+    if (list == NULL) return 0;
+
+    size_t size;
+    for (size = 0; list[size]; size++) {}
+
+    return size;
+}
+
+static int add_to_list(const char *element, 
+                       const char *list_id)
+{
+    char **tmp_list = NULL;
+    size_t list_size = 0;
+    struct config conf;
+    init_config(&conf);
+    parse_config(&conf);
+
+
+    // decide what list to modify.
+    if (!strcmp(list_id, CHECK_LISTID)) {
+        tmp_list = conf.c_lists.l_check_list; 
+    } else if (!strcmp(list_id, TARGET_LIST_ID)) {
+        tmp_list = conf.c_lists.l_target_list;
+    } else {
+        tmp_list = conf.c_lists.l_exclude_list;
     }
+    
+    // get the size of the list.
+    list_size = get_list_size(tmp_list);
+    // add the new element.
+    tmp_list = (char **) realloc(tmp_list, sizeof(char *) * (list_size + 1));
+    tmp_list[list_size - 1] = strdup(element);
+    tmp_list[list_size] = NULL; // terminate the array with NULL.
+
+    if (update_config(&conf) == -1) return -1;
+    destroy_config(&conf);
+    return 0;
+}
+
+static int remove_from_list(int row, const char *list_id)
+{
+    char **tmp_list = NULL;
+    struct config conf;
+    init_config(&conf);
+    parse_config(&conf);
+
+
+    // decide what list to modify.
+    if (!strcmp(list_id, CHECK_LISTID)) {
+        tmp_list = conf.c_lists.l_check_list; 
+    } else if (!strcmp(list_id, TARGET_LIST_ID)) {
+        tmp_list = conf.c_lists.l_target_list;
+    } else {
+        tmp_list = conf.c_lists.l_exclude_list;
+    }
+
+    // O(1) oparation to remove the element.
+    free(tmp_list[row]);
+    tmp_list[row] = NULL; // Make it NULL, so the updater ignore it.
 
     if (update_config(&conf) == -1) return -1;
     destroy_config(&conf);
@@ -73,26 +138,43 @@ int set_mv_without_ext(const char *n_state)
 
 int add_check(const char *path)
 {
+    add_to_list(path, CHECK_LISTID);
 }
 
 int add_target(const char *ext, const char *path)
 {
+    char *build_target = (char *) malloc(sizeof(char) * 
+                                      (strlen(ext)    + 
+                                       strlen(path)   + 2));
+    sprintf(build_target, "%s %s", ext, path);
+    add_to_list(build_target, TARGET_LIST_ID);
+    free(build_target);
 }
 
 int add_exclude(const char *ext, const char *path)
 {
+    char *build_target = (char *) malloc(sizeof(char)  * 
+                                         (strlen(ext)  + 
+                                          strlen(path) + 2));
+    sprintf(build_target, "%s %s", ext, path);
+    add_to_list(build_target, TARGET_LIST_ID);
+    free(build_target);
+
 }
 
 int remove_check(const char *row)
 {
+    remove_from_list(atoi(row), CHECK_LISTID);
 }
 
 int remove_target(const char *row)
 {
+    remove_from_list(atoi(row), TARGET_LIST_ID);
 }
 
 int remove_exclude(const char *row)
 {
+    remove_from_list(atoi(row), EXCLUDE_LIST_ID);
 }
 
 int list_options()
@@ -112,10 +194,10 @@ int list_options()
     return 0;
 }
 
-
-
 int list_checks()
 {
+    // TODO - print each element of the check list with for loop.
+    // TODO - do the same for the other two.
 }
   
 int list_targets()
