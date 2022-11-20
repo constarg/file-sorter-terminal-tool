@@ -40,6 +40,7 @@ Command |  Description
 `sorter --set-default-dir-path [path]` | Changes the default location to `[path]`.
 `--set-enable-default-dir [value]` | 0:1 Enable the to transfer files in default dir.
 `sorter --set-debug-log [value]` | Changes the logs status based on the value `[value]`. It can get the values `1` `(debug mode)` and `0` `(normal mode)`.
+`sorter --set-mv-without-ext [value]` | 0:1 Enable the program to move files without extention.
 `sorter --add-check [path]` | Adds `[path]` to the list of locations that the program looks at.
 `sorter --add-target [ext] [path]` | Adds to the list the information that the program must send the file with extension `[ext]` to the location `[path]` if such a file is found. 
 `sorter --remove-check [row number]` | Deletes the item in the line `[row_number]`, the line number appears with the command `--list-checks` or `--list-targets`. 
