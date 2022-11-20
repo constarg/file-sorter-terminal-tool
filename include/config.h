@@ -24,8 +24,8 @@
  * ******************
  */
 #define CHECK_LISTID 	  "[check]"
-#define TARGET_LIST_ID  "[targests]"
-#define EXCLUDE_LIST_ID "[exclude]"
+#define TARGET_LISTID   "[targets]"
+#define EXCLUDE_LISTID  "[exclude]"
 
 /**
  * ********************

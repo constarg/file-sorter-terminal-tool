@@ -50,7 +50,7 @@ static char *isolate_opt(const char *conf_buff, const char *opt)
     opt_c = strtok(opt_c, " "); // separete the option and the label.
     opt_c = strtok(NULL, "\n"); // get the option.
     opt_c = strdup(opt_c);
-    
+
     free(tmp);
     return opt_c; // return value must be freed.
 }
@@ -59,7 +59,6 @@ static inline unsigned int parse_int_opt(const char *conf_buff, const char *opt)
 {
     char *opt_a = isolate_opt(conf_buff, opt);
     unsigned int opt_r = (opt_a == NULL)? 0:atoi(opt_a);
-    if (opt_r == 0) return -1;	
 
     free(opt_a); 	
     return opt_r; // get the int value.
@@ -136,8 +135,9 @@ void parse_config(struct config *dst)
     dst->c_options.o_enable_default = parse_int_opt(conf_buff, EN_DEFAULT) & 0x1;
     dst->c_options.o_move_no_ext    = parse_int_opt(conf_buff, WITHOUT_EXT) & 0x1;
     dst->c_lists.l_check_list       = parse_list(conf_buff, CHECK_LISTID);
-    dst->c_lists.l_target_list      = parse_list(conf_buff, TARGET_LIST_ID);
-    dst->c_lists.l_exclude_list     = parse_list(conf_buff, EXCLUDE_LIST_ID);
+    dst->c_lists.l_target_list      = parse_list(conf_buff, TARGET_LISTID);
+    dst->c_lists.l_exclude_list     = parse_list(conf_buff, EXCLUDE_LISTID);
+
     free(conf_buff);
 }
 
@@ -183,11 +183,11 @@ int update_config(const struct config *src)
                 conf);
 
     update_list((const char **) src->c_lists.l_target_list,
-                CHECK_LISTID,
+                TARGET_LISTID,
                 conf);
 
     update_list((const char **) src->c_lists.l_exclude_list,
-                CHECK_LISTID,
+                EXCLUDE_LISTID,
                 conf);
 
     free(absolute);
