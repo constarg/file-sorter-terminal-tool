@@ -2,4 +2,4 @@
 # File-Sorter-Terminal-Tool
 File sorter management tool. https://github.com/EmbeddedCat/file-sorter-core
 
-# Tool and core has been merged!! this repo is no longer maintain, check https://github.com/EmbeddedCat/file-sorter-core
+# Tool and core has been merged!! this repo is no longer maintained, check https://github.com/EmbeddedCat/file-sorter-core
